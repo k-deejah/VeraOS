@@ -1,6 +1,6 @@
 # VeraOS Demo Walkthrough & Video Script
 
-This script provides a 2-to-3 minute end-to-end demonstration flow for project judges, reviewers, and video recording.
+This script provides a 2-to-3 minute end-to-end demonstration flow for technical evaluators, partners, and video recording.
 
 ---
 
