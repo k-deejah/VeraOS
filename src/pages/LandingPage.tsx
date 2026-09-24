@@ -9,10 +9,9 @@ import { RequirementInvariant } from "../types/requirement";
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, user, openAuthModal } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [walletModalOpen, setWalletModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [activeStage, setActiveStage] = useState<number>(0);
 
   const { verifications } = useVerificationsList();
@@ -36,13 +35,6 @@ export const LandingPage: React.FC = () => {
       }
     }
   }, [location.state, isAuthenticated, navigate]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/verifications?search=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
 
   const stages = [
     {
@@ -173,23 +165,6 @@ export const LandingPage: React.FC = () => {
             </Link>
           </nav>
 
-          {/* Search Bar */}
-          <form
-            onSubmit={handleSearch}
-            className="hidden md:flex items-center relative flex-1 max-w-xs"
-          >
-            <span className="material-symbols-outlined absolute left-3 text-[#9E948B] text-[18px]">
-              search
-            </span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Verify (Tx ID, Msg, IPFS Hash)..."
-              className="w-full pl-9 pr-3 py-1.5 bg-white border border-[#E8E4DC] rounded-xl text-xs text-[#191513] placeholder-[#9E948B] focus:outline-none focus:border-[#181311] transition-colors"
-            />
-          </form>
-
           {/* Right: CTA & User Mark */}
           <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
             {/* Web3 Wallet Pill / Button */}
@@ -227,14 +202,6 @@ export const LandingPage: React.FC = () => {
               </Link>
             )}
 
-            <Link
-              to={isAuthenticated ? "/dashboard" : "/get-started"}
-              className="w-8 h-8 rounded-full bg-[#EAE5DE] border border-[#D5CEC5] text-[#191513] flex items-center justify-center font-heading font-semibold text-xs hover:border-[#181311] transition-colors"
-              title={isAuthenticated ? "Dashboard" : "Get Started"}
-            >
-              {isAuthenticated ? "VO" : <span className="material-symbols-outlined text-[16px]">login</span>}
-            </Link>
-
             {/* Mobile Hamburger */}
             <button
               type="button"
@@ -252,18 +219,7 @@ export const LandingPage: React.FC = () => {
         {/* Mobile menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-[#E8E4DC] bg-[#F7F5F0] px-4 py-4 flex flex-col gap-3">
-            <form onSubmit={handleSearch} className="relative w-full mb-2">
-              <span className="material-symbols-outlined absolute left-3 top-2 text-[#9E948B] text-[18px]">
-                search
-              </span>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Verify (Tx ID, Msg, IPFS Hash)..."
-                className="w-full pl-9 pr-3 py-2 bg-white border border-[#E8E4DC] rounded-xl text-xs text-[#191513]"
-              />
-            </form>
+
             <a
               href="#how-it-works"
               onClick={() => setMobileMenuOpen(false)}
