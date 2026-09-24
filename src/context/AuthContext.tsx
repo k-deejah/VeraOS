@@ -72,7 +72,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (typeof window !== "undefined" && localStorage.getItem("vera_logged_out") !== "1") {
         const raw = localStorage.getItem(STORAGE_AUTH_KEY);
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed?.id === "usr_demo_operator" || parsed?.email?.includes("operator@vera-os.local")) {
+            localStorage.removeItem(STORAGE_AUTH_KEY);
+            return null;
+          }
+          return parsed;
+        }
       }
     } catch {
       // ignore

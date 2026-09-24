@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { GITHUB_REPO_URL, TELEGRAM_BOT_URL, TELEGRAM_BOT_HANDLE } from "../config/env";
+import { useAuth } from "../context/AuthContext";
 
 interface CodeBlockProps {
   code: string;
@@ -51,6 +52,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, language = "bash", title })
 };
 
 export const Docs: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [activeSection, setActiveSection] = useState<string>("overview");
   const [searchQuery, setSearchQuery] = useState("");
   const [shareCopied, setShareCopied] = useState(false);
@@ -113,7 +115,71 @@ export const Docs: React.FC = () => {
     : sections;
 
   return (
-    <div className="max-w-7xl mx-auto w-full flex flex-col gap-6 font-sans pb-20">
+    <div className="min-h-screen bg-[#F7F5F0] text-[#191513] flex flex-col font-sans selection:bg-[#D97736]/20 selection:text-[#181311]">
+      {/* Top Sticky Navigation Header */}
+      <header className="h-16 border-b border-[#E8E4DC] bg-white/90 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-8 flex items-center justify-between shadow-2xs">
+        <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D97736]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#181311]" />
+            </div>
+            <span className="font-heading font-extrabold text-lg tracking-tight text-[#191513]">
+              Vera<span className="text-[#D97736]">OS</span>
+            </span>
+          </Link>
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-[#FAF8F5] text-[#6B635B] border border-[#E8E4DC]">
+            Docs • v0.2.0
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3 sm:gap-4 text-xs font-semibold">
+          <Link to="/" className="text-[#6B635B] hover:text-[#191513] transition-colors hidden md:inline-flex items-center gap-1">
+            <span className="material-symbols-outlined text-[16px]">home</span>
+            <span>Landing Page</span>
+          </Link>
+          <a
+            href={GITHUB_REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#6B635B] hover:text-[#191513] transition-colors hidden sm:inline-flex items-center gap-1"
+          >
+            <span>GitHub</span>
+            <span className="text-[10px] text-[#9E948B]">↗</span>
+          </a>
+          <a
+            href={TELEGRAM_BOT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#6B635B] hover:text-[#191513] transition-colors hidden sm:inline-flex items-center gap-1"
+          >
+            <span>Telegram</span>
+            <span className="text-[10px] text-[#9E948B]">↗</span>
+          </a>
+
+          {/* Auth Action: ONLY Sign Up if not authenticated, or Dashboard if authenticated */}
+          {isAuthenticated ? (
+            <Link
+              to="/dashboard"
+              className="px-4 py-2 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white transition-all shadow-sm flex items-center gap-1.5"
+            >
+              <span>Dashboard</span>
+              <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
+            </Link>
+          ) : (
+            <Link
+              to="/signup"
+              className="px-4 py-2 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white transition-all shadow-sm flex items-center gap-1.5"
+            >
+              <span>Sign Up</span>
+              <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
+            </Link>
+          )}
+        </div>
+      </header>
+
+      {/* Main Documentation Container */}
+      <div className="max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 flex flex-col gap-6 pb-20">
       {/* 1. Developer Documentation Header */}
       <div className="bg-white rounded-3xl border border-[#E8E4DC] p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-3">
@@ -1246,6 +1312,7 @@ def submit_task_for_verification(task_prompt: str, agent_output: str, tx_hash: s
         </main>
       </div>
     </div>
+  </div>
   );
 };
 

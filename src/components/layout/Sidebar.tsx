@@ -152,55 +152,66 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
           </a>
         </div>
 
-        {/* User Account */}
-        <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#201A18] border border-[#2A2320]">
-          <Link
-            to="/profile"
-            onClick={onCloseMobile}
-            className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity"
-          >
-            {user?.avatar ? (
-              <img
-                src={user.avatar}
-                alt={user.name || "Operator"}
-                className="w-8 h-8 rounded-lg object-cover border border-[#3D322E] shrink-0"
-              />
-            ) : (
-              <div className="w-8 h-8 rounded-lg bg-[#2D2421] border border-[#3D322E] text-[#D97736] flex items-center justify-center font-heading font-bold text-xs shrink-0">
-                {user?.name
-                  ? user.name
-                      .split(" ")
-                      .map((p) => p[0])
-                      .filter(Boolean)
-                      .slice(0, 2)
-                      .join("")
-                      .toUpperCase()
-                  : user?.email
-                  ? user.email.slice(0, 2).toUpperCase()
-                  : "OP"}
+        {/* User Account or Sign Up */}
+        {user ? (
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#201A18] border border-[#2A2320]">
+            <Link
+              to="/profile"
+              onClick={onCloseMobile}
+              className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity"
+            >
+              {user.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={user.name || "User"}
+                  className="w-8 h-8 rounded-lg object-cover border border-[#3D322E] shrink-0"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-lg bg-[#2D2421] border border-[#3D322E] text-[#D97736] flex items-center justify-center font-heading font-bold text-xs shrink-0">
+                  {user.name
+                    ? user.name
+                        .split(" ")
+                        .map((p) => p[0])
+                        .filter(Boolean)
+                        .slice(0, 2)
+                        .join("")
+                        .toUpperCase()
+                    : user.email
+                    ? user.email.slice(0, 2).toUpperCase()
+                    : "VO"}
+                </div>
+              )}
+              <div className="truncate">
+                <p className="font-heading font-semibold text-xs text-white truncate">
+                  {user.name || "Operator"}
+                </p>
+                <p className="font-mono text-[10px] text-[#9E948B] truncate">
+                  {user.walletAddress
+                    ? `${user.walletAddress.slice(0, 4)}...${user.walletAddress.slice(-4)}`
+                    : user.email || "Active"}
+                </p>
               </div>
-            )}
-            <div className="truncate">
-              <p className="font-heading font-semibold text-xs text-white truncate">
-                {user?.name || "Operator"}
-              </p>
-              <p className="font-mono text-[10px] text-[#9E948B] truncate">
-                {user?.walletAddress
-                  ? `${user.walletAddress.slice(0, 4)}...${user.walletAddress.slice(-4)}`
-                  : user?.email || "Signed In"}
-              </p>
-            </div>
-          </Link>
+            </Link>
 
-          <button
-            type="button"
-            onClick={() => logout()}
-            title="Sign Out"
-            className="p-1.5 rounded-lg text-[#9E948B] hover:text-[#f87171] hover:bg-white/5 transition-colors cursor-pointer shrink-0 ml-1"
+            <button
+              type="button"
+              onClick={() => logout()}
+              title="Sign Out"
+              className="p-1.5 rounded-lg text-[#9E948B] hover:text-[#f87171] hover:bg-white/5 transition-colors cursor-pointer shrink-0 ml-1"
+            >
+              <span className="material-symbols-outlined text-[18px]">logout</span>
+            </button>
+          </div>
+        ) : (
+          <Link
+            to="/signup"
+            onClick={onCloseMobile}
+            className="w-full py-2.5 px-3 rounded-xl bg-[#D97736] hover:bg-[#B8621B] text-white font-heading font-semibold text-xs text-center transition-all flex items-center justify-center gap-2 shadow-sm"
           >
-            <span className="material-symbols-outlined text-[18px]">logout</span>
-          </button>
-        </div>
+            <span>Sign Up</span>
+            <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </Link>
+        )}
       </div>
     </aside>
   );

@@ -197,6 +197,15 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: "/docs",
+        errorElement: <RouteErrorFallback />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <Docs />
+          </Suspense>
+        ),
+      },
 
       // Protected App Shell Routes (Requires Active Authentication)
       {
@@ -330,28 +339,14 @@ export const router = createBrowserRouter([
         ],
       },
 
-      // Unprotected Documentation & Fallback Routes in AppShell
       {
-        element: <AppShell />,
+        path: "*",
         errorElement: <RouteErrorFallback />,
-        children: [
-          {
-            path: "/docs",
-            element: (
-              <Suspense fallback={<PageLoader />}>
-                <Docs />
-              </Suspense>
-            ),
-          },
-          {
-            path: "*",
-            element: (
-              <Suspense fallback={<PageLoader />}>
-                <NotFound />
-              </Suspense>
-            ),
-          },
-        ],
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <NotFound />
+          </Suspense>
+        ),
       },
     ],
   },
