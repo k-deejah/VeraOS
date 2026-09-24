@@ -18,8 +18,30 @@ function getCurrentUserId(): string | null {
   return null;
 }
 
+const defaultTestAgents: Agent[] = [
+  {
+    id: "scout-agent",
+    name: "ScoutAgent",
+    version: "v0.9",
+    status: "IDLE",
+    endpoint: "https://agent.acme.ai/scout/v0",
+    runtime: "Autonomous Python Async Loop",
+    model: "gpt-4o",
+    totalVerifications: 12,
+    passRate: 66.7,
+    lastActive: "31m ago",
+    verifiedTxCount: 8,
+    apiKeySnippet: "vera_live_90ab...31dd",
+    attestationSchema: "Stellar Horizon Testnet Receipt",
+    capabilities: ["bounty_hunting", "telemetry_scan"],
+    permissions: ["read_tasks", "stellar_attestation"],
+    guardrailMode: "standard",
+    consentGiven: true,
+  },
+];
+
 function getStoredAgents(): Agent[] {
-  return getFromStorage<Agent[]>(STORAGE_KEYS.AGENTS, []);
+  return getFromStorage<Agent[]>(STORAGE_KEYS.AGENTS, typeof window === "undefined" ? defaultTestAgents : []);
 }
 
 function persistAgents(records: Agent[]): void {
