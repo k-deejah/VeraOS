@@ -38,6 +38,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
       active: location.pathname === "/evidence" || location.pathname.includes("/evidence"),
     },
     {
+      label: "Profile & Keys",
+      icon: "account_circle",
+      path: "/profile",
+      active: location.pathname === "/profile" || location.pathname === "/account",
+    },
+    {
       label: "Documentation",
       icon: "menu_book",
       path: "/docs",
@@ -149,7 +155,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
         {/* User Account */}
         <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#201A18] border border-[#2A2320]">
           <Link
-            to="/account"
+            to="/profile"
             onClick={onCloseMobile}
             className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity"
           >

@@ -1,10 +1,11 @@
 import React, { Suspense, lazy } from "react";
-import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet, Link, useNavigate } from "react-router-dom";
 import { AppShell } from "../components/layout/AppShell";
 import { AuthModal } from "../components/auth/AuthModal";
 import { AgentConnectModal } from "../components/agent/AgentConnectModal";
 import { RouteErrorFallback } from "../components/common/RouteErrorFallback";
 import { ProtectedRoute } from "../components/auth/ProtectedRoute";
+import { useAuth } from "../context/AuthContext";
 
 const LandingPage = lazy(() =>
   import("../pages/LandingPage").then((m) => ({ default: m.LandingPage }))
@@ -60,6 +61,43 @@ const Welcome = lazy(() =>
 const Account = lazy(() =>
   import("../pages/Account").then((m) => ({ default: m.Account }))
 );
+const Danger = lazy(() =>
+  import("../pages/Danger").then((m) => ({ default: m.Danger }))
+);
+
+const LogoutPage: React.FC = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    logout();
+    const timer = setTimeout(() => {
+      navigate("/", { replace: true });
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [logout, navigate]);
+
+  return (
+    <div className="min-h-screen bg-[#F7F5F0] flex flex-col items-center justify-center p-6 text-center font-sans">
+      <div className="w-14 h-14 rounded-2xl bg-white border border-[#E8E4DC] flex items-center justify-center text-[#D97736] mb-4 shadow-sm">
+        <span className="material-symbols-outlined text-[28px]">logout</span>
+      </div>
+      <h1 className="font-heading font-extrabold text-2xl text-[#191513]">
+        Signed out of VeraOS
+      </h1>
+      <p className="text-sm text-[#6B635B] mt-1 max-w-sm">
+        Your active session and operator keys have been safely cleared from this browser.
+      </p>
+      <Link
+        to="/"
+        className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white text-xs font-semibold shadow-sm transition-all"
+      >
+        <span className="material-symbols-outlined text-[16px]">home</span>
+        <span>Return to Landing Page</span>
+      </Link>
+    </div>
+  );
+};
 
 const PageLoader = () => (
   <div className="min-h-[50vh] flex flex-col items-center justify-center gap-3 text-[#6B635B]">
@@ -112,8 +150,30 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "/signin",
+        errorElement: <RouteErrorFallback />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <GetStarted />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/signup",
+        errorElement: <RouteErrorFallback />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <GetStarted />
+          </Suspense>
+        ),
+      },
+      {
         path: "/login",
-        element: <Navigate to="/get-started" replace />,
+        element: <Navigate to="/signin" replace />,
+      },
+      {
+        path: "/logout",
+        element: <LogoutPage />,
       },
       {
         path: "/invite",
@@ -248,6 +308,22 @@ export const router = createBrowserRouter([
             element: (
               <Suspense fallback={<PageLoader />}>
                 <Account />
+              </Suspense>
+            ),
+          },
+          {
+            path: "/profile",
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <Account />
+              </Suspense>
+            ),
+          },
+          {
+            path: "/danger",
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <Danger />
               </Suspense>
             ),
           },

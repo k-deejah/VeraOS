@@ -18,6 +18,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
     { label: "My agents", icon: "smart_toy", path: "/agents" },
     { label: "Verification runs", icon: "verified", path: "/verifications" },
     { label: "Evidence library", icon: "folder_open", path: "/evidence" },
+    { label: "Profile & Keys", icon: "account_circle", path: "/profile" },
     { label: "Documentation", icon: "menu_book", path: "/docs" },
     { label: "Landing page", icon: "home", path: "/" },
   ];
@@ -128,7 +129,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
           {user ? (
             <div className="flex flex-col gap-2">
               <Link
-                to="/account"
+                to="/profile"
                 onClick={onClose}
                 className="flex items-center gap-2.5 p-2 rounded-xl bg-[#201A18] border border-[#2A2320]"
               >

@@ -7,6 +7,18 @@ export const GetStarted: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, loading, loginWithGoogle, loginAsDemo } = useAuth();
+
+  const isSignUpPath = location.pathname === "/signup";
+  const [authMode, setAuthMode] = useState<"signin" | "signup">(isSignUpPath ? "signup" : "signin");
+
+  useEffect(() => {
+    if (location.pathname === "/signup") {
+      setAuthMode("signup");
+    } else if (location.pathname === "/signin" || location.pathname === "/login") {
+      setAuthMode("signin");
+    }
+  }, [location.pathname]);
+
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [customKey, setCustomKey] = useState("");
@@ -89,13 +101,47 @@ export const GetStarted: React.FC = () => {
             </span>
           </div>
 
-          {/* Heading required by prompt */}
+          {/* Mode Switcher Tabs */}
+          <div className="flex items-center p-1 bg-[#FAF8F5] border border-[#E8E4DC] rounded-2xl mb-6">
+            <button
+              type="button"
+              onClick={() => {
+                setAuthMode("signin");
+                navigate("/signin", { replace: true });
+              }}
+              className={`flex-1 py-2 text-xs font-heading font-semibold rounded-xl transition-all cursor-pointer ${
+                authMode === "signin"
+                  ? "bg-white text-[#191513] shadow-xs"
+                  : "text-[#6B635B] hover:text-[#191513]"
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAuthMode("signup");
+                navigate("/signup", { replace: true });
+              }}
+              className={`flex-1 py-2 text-xs font-heading font-semibold rounded-xl transition-all cursor-pointer ${
+                authMode === "signup"
+                  ? "bg-white text-[#191513] shadow-xs"
+                  : "text-[#6B635B] hover:text-[#191513]"
+              }`}
+            >
+              Sign Up
+            </button>
+          </div>
+
+          {/* Heading */}
           <h1 className="font-heading font-extrabold text-2xl sm:text-3xl text-[#191513] tracking-tight">
-            Welcome to VeraOS
+            {authMode === "signin" ? "Sign in to VeraOS" : "Create your Account"}
           </h1>
 
           <p className="text-sm text-[#6B635B] mt-2.5 leading-relaxed">
-            The verification layer for AI agents. Verify before you trust.
+            {authMode === "signin"
+              ? "Welcome back. Access your verification runs, agents, and cryptographic proofs."
+              : "Deploy independent verification for your autonomous AI agents in minutes."}
           </p>
 
           {/* Error Alert */}
@@ -105,7 +151,7 @@ export const GetStarted: React.FC = () => {
                 error
               </span>
               <div className="flex-1 leading-relaxed">
-                <span className="font-semibold block mb-0.5">Sign in error:</span>
+                <span className="font-semibold block mb-0.5">Authentication notice:</span>
                 {errorMsg}
               </div>
             </div>
@@ -122,7 +168,7 @@ export const GetStarted: React.FC = () => {
               {submitting ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Redirecting to Google...</span>
+                  <span>Connecting to Google OAuth...</span>
                 </>
               ) : (
                 <>
@@ -144,7 +190,9 @@ export const GetStarted: React.FC = () => {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                     />
                   </svg>
-                  <span>Continue with Google</span>
+                  <span>
+                    {authMode === "signin" ? "Sign in with Google" : "Sign up with Google"}
+                  </span>
                 </>
               )}
             </button>
@@ -168,8 +216,45 @@ export const GetStarted: React.FC = () => {
               <span className="material-symbols-outlined text-[18px] text-[#D97736]">
                 bolt
               </span>
-              <span>Continue as Demo Operator (Instant Access)</span>
+              <span>
+                {authMode === "signin"
+                  ? "Continue as Demo Operator (Instant Access)"
+                  : "Explore with Demo Access"}
+              </span>
             </button>
+          </div>
+
+          {/* Toggle Helper Link */}
+          <div className="mt-6 text-xs text-[#6B635B]">
+            {authMode === "signin" ? (
+              <span>
+                Don't have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("signup");
+                    navigate("/signup", { replace: true });
+                  }}
+                  className="font-semibold text-[#181311] hover:text-[#D97736] underline cursor-pointer"
+                >
+                  Sign Up
+                </button>
+              </span>
+            ) : (
+              <span>
+                Already have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode("signin");
+                    navigate("/signin", { replace: true });
+                  }}
+                  className="font-semibold text-[#181311] hover:text-[#D97736] underline cursor-pointer"
+                >
+                  Sign In
+                </button>
+              </span>
+            )}
           </div>
 
           {/* Inline Supabase Anon Key Setup Card when missing in environment */}
@@ -202,7 +287,7 @@ export const GetStarted: React.FC = () => {
                   }}
                   className="w-full py-2.5 px-3 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white text-xs font-semibold cursor-pointer transition-all"
                 >
-                  Save Key & Enable Google Auth
+                  Save Key &amp; Enable Google Auth
                 </button>
               </div>
               <div className="mt-3 pt-2.5 border-t border-[#F3DFC9] text-[11px] text-[#9E948B] flex items-center justify-between">
@@ -219,26 +304,22 @@ export const GetStarted: React.FC = () => {
             </div>
           )}
 
-          {/* Footer Notes */}
-          <div className="mt-8 pt-6 border-t border-[#E8E4DC] flex flex-col gap-2 text-center text-xs text-[#9E948B]">
-            <p>
-              By signing in, you agree to the{" "}
-              <Link to="/terms" className="underline hover:text-[#191513]">
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link to="/privacy" className="underline hover:text-[#191513]">
-                Privacy Policy
-              </Link>
-              .
-            </p>
-            <div className="flex items-center justify-center gap-1.5 mt-2 font-mono text-[10px] text-[#6B635B]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#1D7A46]" />
-              <span>Secured by Supabase Auth</span>
-            </div>
-          </div>
+          {/* Privacy & Terms Note */}
+          <p className="text-[11px] text-[#9E948B] mt-6 leading-relaxed">
+            By continuing, you agree to VeraOS{" "}
+            <Link to="/terms" className="underline hover:text-[#191513]">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link to="/privacy" className="underline hover:text-[#191513]">
+              Privacy Policy
+            </Link>
+            .
+          </p>
         </div>
       </div>
     </div>
   );
 };
+
+export default GetStarted;

@@ -53,6 +53,8 @@ const CodeBlock: React.FC<CodeBlockProps> = ({ code, language = "bash", title })
 export const Docs: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>("overview");
   const [searchQuery, setSearchQuery] = useState("");
+  const [shareCopied, setShareCopied] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   // Interactive Playground State
   const [playgroundPreset, setPlaygroundPreset] = useState<"stellar" | "refund" | "dex">("stellar");
@@ -94,6 +96,8 @@ export const Docs: React.FC = () => {
   const currentIndex = allItems.findIndex((i) => i.id === activeSection);
   const prevDoc = currentIndex > 0 ? allItems[currentIndex - 1] : null;
   const nextDoc = currentIndex < allItems.length - 1 ? allItems[currentIndex + 1] : null;
+  const activeGroup = sections.find((g) => g.items.some((i) => i.id === activeSection));
+  const activeItem = activeGroup?.items.find((i) => i.id === activeSection);
 
   const filteredSections = searchQuery.trim()
     ? sections
@@ -237,6 +241,41 @@ export const Docs: React.FC = () => {
 
         {/* Right Content Area (8 cols on lg) */}
         <main className="lg:col-span-8 flex flex-col gap-6">
+          {/* Document Header Breadcrumb & Quick Toolbar */}
+          <div className="bg-white rounded-2xl border border-[#E8E4DC] px-5 py-3 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-[#6B635B] flex-wrap">
+              <Link to="/docs" className="hover:text-[#191513] font-medium transition-colors">
+                Docs
+              </Link>
+              <span>/</span>
+              <span className="text-[#8C8479]">{activeGroup?.group || "Foundations"}</span>
+              <span>/</span>
+              <span className="text-[#191513] font-semibold">{activeItem?.label || "Overview"}</span>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <span className="text-[#8C8479] font-mono text-[11px] flex items-center gap-1">
+                <span className="material-symbols-outlined text-[14px]">schedule</span>
+                <span>~4 min read</span>
+              </span>
+              <span className="text-[#E8E4DC]">•</span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  setShareCopied(true);
+                  setTimeout(() => setShareCopied(false), 2000);
+                }}
+                className="text-[#D97736] hover:text-[#B8621B] font-semibold inline-flex items-center gap-1 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[14px]">
+                  {shareCopied ? "check" : "share"}
+                </span>
+                <span>{shareCopied ? "Link Copied" : "Share"}</span>
+              </button>
+            </div>
+          </div>
+
           {/* SECTION: Overview & Protocol Architecture */}
           {activeSection === "overview" && (
             <div className="bg-white rounded-3xl border border-[#E8E4DC] p-6 sm:p-9 shadow-sm flex flex-col gap-6">
@@ -1129,8 +1168,41 @@ def submit_task_for_verification(task_prompt: str, agent_output: str, tx_hash: s
               </div>
             </div>
           )}
+
+          {/* Article Helpful Feedback Widget */}
+          <div className="bg-white rounded-2xl border border-[#E8E4DC] p-5 shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+            <div className="flex items-center gap-2 text-[#191513] font-semibold">
+              <span className="material-symbols-outlined text-[18px] text-[#D97736]">thumb_up</span>
+              <span>Was this documentation page helpful?</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setFeedback("yes")}
+                className={`px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                  feedback === "yes"
+                    ? "bg-[#EAF5EE] border-[#CDE5D5] text-[#1D7A46]"
+                    : "bg-white border-[#E8E4DC] text-[#6B635B] hover:text-[#191513] hover:bg-[#FAF8F5]"
+                }`}
+              >
+                {feedback === "yes" ? "✓ Helpful" : "Yes"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setFeedback("no")}
+                className={`px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                  feedback === "no"
+                    ? "bg-[#FEF2F2] border-[#FECACA] text-[#DC2626]"
+                    : "bg-white border-[#E8E4DC] text-[#6B635B] hover:text-[#191513] hover:bg-[#FAF8F5]"
+                }`}
+              >
+                {feedback === "no" ? "Thanks for feedback" : "Could improve"}
+              </button>
+            </div>
+          </div>
+
           {/* Topic Pager (Previous / Next Section) */}
-          <div className="pt-8 mt-8 border-t border-[#E8E4DC] flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="pt-4 border-t border-[#E8E4DC] flex flex-col sm:flex-row items-center justify-between gap-4">
             {prevDoc ? (
               <button
                 type="button"

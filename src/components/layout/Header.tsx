@@ -48,7 +48,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
     if (p.startsWith("/verify/")) return "Verification Detail";
     if (p.startsWith("/agents")) return "My agents";
     if (p === "/evidence") return "Evidence library";
-    if (p === "/account") return "Account Settings";
+    if (p === "/account" || p === "/profile") return "Profile & Account Settings";
+    if (p === "/danger") return "Danger Zone";
+    if (p === "/welcome") return "Welcome to VeraOS";
     if (p === "/docs") return "Documentation";
     return "VeraOS";
   };
@@ -303,98 +305,137 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
             )}
           </div>
 
-          {/* 3. User Account Avatar Menu */}
-          <div className="relative" ref={accountRef}>
-            <button
-              type="button"
-              onClick={() => setAccountMenuOpen((prev) => !prev)}
-              className="flex items-center gap-2 p-1 rounded-full bg-white hover:bg-[#F3EFEA] border border-[#E8E4DC] transition-colors cursor-pointer shadow-2xs"
-              title="User Profile"
-            >
-              {user?.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={user.name || "Operator"}
-                  className="w-8 h-8 rounded-full object-cover border border-[#E8E4DC]"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-full bg-[#181311] text-[#F7F5F0] flex items-center justify-center font-heading font-medium text-xs">
-                  {user?.name
-                    ? user.name
-                        .split(" ")
-                        .map((p) => p[0])
-                        .filter(Boolean)
-                        .slice(0, 2)
-                        .join("")
-                        .toUpperCase()
-                    : user?.email
-                    ? user.email.slice(0, 2).toUpperCase()
-                    : "OP"}
+          {/* 3. User Account Avatar Menu or Sign In / Sign Up */}
+          {user ? (
+            <div className="relative" ref={accountRef}>
+              <button
+                type="button"
+                onClick={() => setAccountMenuOpen((prev) => !prev)}
+                className="flex items-center gap-2 p-1 rounded-full bg-white hover:bg-[#F3EFEA] border border-[#E8E4DC] transition-colors cursor-pointer shadow-2xs"
+                title="User Profile & Google Account"
+              >
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name || "Operator"}
+                    className="w-8 h-8 rounded-full object-cover border border-[#E8E4DC]"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-[#181311] text-[#F7F5F0] flex items-center justify-center font-heading font-medium text-xs">
+                    {user.name
+                      ? user.name
+                          .split(" ")
+                          .map((p) => p[0])
+                          .filter(Boolean)
+                          .slice(0, 2)
+                          .join("")
+                          .toUpperCase()
+                      : user.email
+                      ? user.email.slice(0, 2).toUpperCase()
+                      : "OP"}
+                  </div>
+                )}
+                <span className="sr-only">Toggle user menu</span>
+              </button>
+
+              {accountMenuOpen && (
+                <div className="absolute right-0 mt-2 w-60 rounded-2xl bg-white border border-[#E8E4DC] shadow-lg p-2 z-50 flex flex-col gap-1 text-xs">
+                  <div className="px-3 py-2 border-b border-[#E8E4DC] mb-1">
+                    <p className="font-heading font-semibold text-[#191513] truncate">
+                      {user.name || "Operator"}
+                    </p>
+                    <p className="font-mono text-[10px] text-[#6B635B] truncate">
+                      {user.email || ""}
+                    </p>
+                  </div>
+
+                  <Link
+                    to="/profile"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#191513] hover:bg-[#F7F5F0] transition-colors font-medium"
+                  >
+                    <span className="material-symbols-outlined text-[16px] text-[#D97736]">
+                      account_circle
+                    </span>
+                    <span>Google Profile</span>
+                  </Link>
+
+                  <Link
+                    to="/welcome"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#191513] hover:bg-[#F7F5F0] transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[16px] text-[#6B635B]">
+                      explore
+                    </span>
+                    <span>Welcome &amp; Tour</span>
+                  </Link>
+
+                  <Link
+                    to="/docs"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#191513] hover:bg-[#F7F5F0] transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[16px] text-[#6B635B]">
+                      menu_book
+                    </span>
+                    <span>Documentation</span>
+                  </Link>
+
+                  <Link
+                    to="/"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#191513] hover:bg-[#F7F5F0] transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[16px] text-[#6B635B]">
+                      home
+                    </span>
+                    <span>Landing Page</span>
+                  </Link>
+
+                  <Link
+                    to="/danger"
+                    onClick={() => setAccountMenuOpen(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#DC2626] hover:bg-[#FEF2F2] transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[16px] text-[#DC2626]">
+                      warning
+                    </span>
+                    <span>Danger Zone</span>
+                  </Link>
+
+                  <div className="border-t border-[#E8E4DC] my-1" />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountMenuOpen(false);
+                      logout();
+                    }}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#DC2626] hover:bg-[#FEF2F2] transition-colors cursor-pointer text-left w-full font-semibold"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">logout</span>
+                    <span>Sign Out</span>
+                  </button>
                 </div>
               )}
-              <span className="sr-only">Toggle user menu</span>
-            </button>
-
-            {accountMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-[#E8E4DC] shadow-lg p-2 z-50 flex flex-col gap-1 text-xs">
-                <div className="px-3 py-2 border-b border-[#E8E4DC] mb-1">
-                  <p className="font-heading font-semibold text-[#191513] truncate">
-                    {user?.name || "Operator"}
-                  </p>
-                  <p className="font-mono text-[10px] text-[#6B635B] truncate">
-                    {user?.email || ""}
-                  </p>
-                </div>
-
-                <Link
-                  to="/"
-                  onClick={() => setAccountMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#191513] hover:bg-[#F7F5F0] transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[16px] text-[#6B635B]">
-                    home
-                  </span>
-                  <span>Landing Page</span>
-                </Link>
-
-                <Link
-                  to="/account"
-                  onClick={() => setAccountMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#191513] hover:bg-[#F7F5F0] transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[16px] text-[#6B635B]">
-                    manage_accounts
-                  </span>
-                  <span>Account Settings</span>
-                </Link>
-
-                <Link
-                  to="/docs"
-                  onClick={() => setAccountMenuOpen(false)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#191513] hover:bg-[#F7F5F0] transition-colors"
-                >
-                  <span className="material-symbols-outlined text-[16px] text-[#6B635B]">
-                    description
-                  </span>
-                  <span>Documentation</span>
-                </Link>
-
-                <div className="border-t border-[#E8E4DC] my-1" />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAccountMenuOpen(false);
-                    logout();
-                  }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-red-600 hover:bg-red-50 transition-colors cursor-pointer text-left w-full"
-                >
-                  <span className="material-symbols-outlined text-[16px]">logout</span>
-                  <span>Sign Out</span>
-                </button>
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link
+                to="/signin"
+                className="px-3 py-1.5 rounded-xl border border-[#E8E4DC] hover:border-[#181311] text-xs font-semibold text-[#191513] transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/signup"
+                className="px-3.5 py-1.5 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-xs font-semibold text-white transition-colors"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
         </div>
       </header>
 
