@@ -96,6 +96,16 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
 
         {/* Right Controls: Web3 Network, Wallet, Explorer & Account */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Quick link: Back to Landing Page */}
+          <Link
+            to="/"
+            className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E8E4DC] hover:border-[#181311] text-[#6B635B] hover:text-[#181311] text-xs font-heading font-medium transition-colors shadow-2xs"
+            title="Navigate to Landing Page"
+          >
+            <span className="material-symbols-outlined text-[15px]">home</span>
+            <span>Landing Page</span>
+          </Link>
+
           {/* 1. Web3 Network Selector Dropdown */}
           <div className="relative" ref={networkRef}>
             <button
@@ -335,6 +345,17 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
                     {user?.email || ""}
                   </p>
                 </div>
+
+                <Link
+                  to="/"
+                  onClick={() => setAccountMenuOpen(false)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-[#191513] hover:bg-[#F7F5F0] transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[16px] text-[#6B635B]">
+                    home
+                  </span>
+                  <span>Landing Page</span>
+                </Link>
 
                 <Link
                   to="/account"

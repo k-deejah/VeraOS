@@ -16,9 +16,18 @@ export const NotFound: React.FC = () => {
       <p className="text-sm text-[#B9A99B] max-w-md">
         The requested path does not exist in the VeraOS verification routing map.
       </p>
-      <Link to="/dashboard" className="pt-2">
-        <Button variant="primary">Return to Dashboard</Button>
-      </Link>
+      <div className="pt-2 flex items-center justify-center gap-3 flex-wrap">
+        <Link to="/">
+          <Button variant="secondary" icon={<span className="material-symbols-outlined text-[16px]">home</span>}>
+            Landing Page
+          </Button>
+        </Link>
+        <Link to="/dashboard">
+          <Button variant="primary" icon={<span className="material-symbols-outlined text-[16px]">dashboard</span>}>
+            Return to Dashboard
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 };

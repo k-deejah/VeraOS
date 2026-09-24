@@ -126,7 +126,16 @@ export const EvidenceExplorer: React.FC = () => {
     <div className="max-w-4xl mx-auto w-full flex flex-col gap-6 font-sans pb-16">
       {/* Breadcrumb & Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs text-[#6B635B]">
+        <div className="flex items-center gap-2 text-xs text-[#6B635B] flex-wrap">
+          <Link to="/" className="hover:text-[#181311] transition-colors flex items-center gap-1 font-medium">
+            <span className="material-symbols-outlined text-[14px]">home</span>
+            <span>Home</span>
+          </Link>
+          <span>/</span>
+          <Link to="/dashboard" className="hover:text-[#181311] transition-colors">
+            Dashboard
+          </Link>
+          <span>/</span>
           <Link to="/verifications" className="hover:text-[#181311] transition-colors">
             Verifications
           </Link>
@@ -142,7 +151,7 @@ export const EvidenceExplorer: React.FC = () => {
             <span className="font-mono">Evidence</span>
           )}
           <span>/</span>
-          <span className="text-[#181311]">Evidence details</span>
+          <span className="text-[#181311] font-semibold">Evidence details</span>
         </div>
 
         {activeId && (
@@ -358,6 +367,55 @@ export const EvidenceExplorer: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Next Steps & Navigation Pager */}
+      <div className="pt-6 border-t border-[#E8E4DC] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-[#6B635B]">
+        <div className="flex items-center gap-3">
+          <Link
+            to={activeId ? `/verify/${activeId}` : "/verifications"}
+            className="inline-flex items-center gap-1.5 text-[#181311] hover:underline font-semibold"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <span>Return to verification run</span>
+          </Link>
+          <span>•</span>
+          <Link
+            to="/verifications"
+            className="hover:text-[#181311] transition-colors"
+          >
+            All verifications
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {activeId && (verification?.status === "FAILED" || (latestAttempt?.invariants || []).some(inv => inv.status === "FAILED")) ? (
+            <Link
+              to={`/verify/${activeId}/remediate`}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white font-semibold shadow-xs transition-colors"
+            >
+              <span>Next: Fix discrepancy</span>
+              <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
+            </Link>
+          ) : (
+            <Link
+              to="/verify/new"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white font-semibold shadow-xs transition-colors"
+            >
+              <span>Run another verification</span>
+              <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
+            </Link>
+          )}
+
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 text-[#6B635B] hover:text-[#181311] transition-colors font-medium ml-1"
+            title="Return to Landing page"
+          >
+            <span className="material-symbols-outlined text-[15px]">home</span>
+            <span className="hidden sm:inline">Landing page</span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

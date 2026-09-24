@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCreateVerification } from "../hooks/useCreateVerification";
 import { useAgentContext } from "../context/AgentContext";
 
@@ -129,6 +129,24 @@ export const NewVerification: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto w-full flex flex-col gap-6 font-sans">
+      {/* Top Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-xs text-[#6B635B] flex-wrap">
+        <Link to="/" className="hover:text-[#191513] transition-colors flex items-center gap-1 font-medium">
+          <span className="material-symbols-outlined text-[14px]">home</span>
+          <span>Home</span>
+        </Link>
+        <span>/</span>
+        <Link to="/dashboard" className="hover:text-[#191513] transition-colors">
+          Dashboard
+        </Link>
+        <span>/</span>
+        <Link to="/verifications" className="hover:text-[#191513] transition-colors">
+          Verifications
+        </Link>
+        <span>/</span>
+        <span className="text-[#191513] font-semibold">New verification</span>
+      </div>
+
       {/* 1. Header (Image 4) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -360,6 +378,34 @@ export const NewVerification: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {/* Navigation Pager */}
+      <div className="pt-4 border-t border-[#E8E4DC] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-[#6B635B]">
+        <Link
+          to="/verifications"
+          className="inline-flex items-center gap-1.5 hover:text-[#191513] transition-colors"
+        >
+          <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span>Back to All verifications</span>
+        </Link>
+
+        <div className="flex items-center gap-3">
+          <Link
+            to="/dashboard"
+            className="hover:text-[#191513] transition-colors"
+          >
+            Dashboard
+          </Link>
+          <span>•</span>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 text-[#191513] hover:underline font-semibold"
+          >
+            <span className="material-symbols-outlined text-[14px]">home</span>
+            <span>Landing page</span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

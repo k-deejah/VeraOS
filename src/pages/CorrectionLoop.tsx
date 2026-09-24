@@ -120,19 +120,28 @@ export const CorrectionLoop: React.FC = () => {
   return (
     <div className="max-w-3xl mx-auto w-full flex flex-col gap-6 font-sans pb-16">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-xs text-[#6B635B]">
+      <div className="flex items-center gap-2 text-xs text-[#6B635B] flex-wrap">
+        <Link to="/" className="hover:text-[#181311] transition-colors flex items-center gap-1 font-medium">
+          <span className="material-symbols-outlined text-[14px]">home</span>
+          <span>Home</span>
+        </Link>
+        <span>/</span>
         <Link to="/dashboard" className="hover:text-[#181311] transition-colors">
+          Dashboard
+        </Link>
+        <span>/</span>
+        <Link to="/verifications" className="hover:text-[#181311] transition-colors">
           Verifications
         </Link>
         <span>/</span>
         <Link
-          to={id ? `/verify/${id}` : "/dashboard"}
+          to={id ? `/verify/${id}` : "/verifications"}
           className="hover:text-[#181311] transition-colors font-mono"
         >
           {runId}
         </Link>
         <span>/</span>
-        <span className="text-[#181311]">Remediate & Resubmit</span>
+        <span className="text-[#181311] font-semibold">Remediate & Resubmit</span>
       </div>
 
       {/* Header */}
@@ -343,6 +352,34 @@ export const CorrectionLoop: React.FC = () => {
           </>
         )}
       </form>
+
+      {/* Quick Navigation Footer */}
+      <div className="pt-6 border-t border-[#E8E4DC] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-[#6B635B]">
+        <Link
+          to={id ? `/verify/${id}` : "/verifications"}
+          className="inline-flex items-center gap-1.5 hover:text-[#181311] transition-colors"
+        >
+          <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span>Return to verification run</span>
+        </Link>
+
+        <div className="flex items-center gap-3">
+          <Link
+            to="/verifications"
+            className="hover:text-[#181311] transition-colors"
+          >
+            All verifications
+          </Link>
+          <span>•</span>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 text-[#181311] hover:underline font-semibold"
+          >
+            <span className="material-symbols-outlined text-[14px]">home</span>
+            <span>Landing page</span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };

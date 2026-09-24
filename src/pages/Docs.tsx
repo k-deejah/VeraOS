@@ -91,6 +91,10 @@ export const Docs: React.FC = () => {
   ];
 
   const allItems = sections.flatMap((g) => g.items);
+  const currentIndex = allItems.findIndex((i) => i.id === activeSection);
+  const prevDoc = currentIndex > 0 ? allItems[currentIndex - 1] : null;
+  const nextDoc = currentIndex < allItems.length - 1 ? allItems[currentIndex + 1] : null;
+
   const filteredSections = searchQuery.trim()
     ? sections
         .map((g) => ({
@@ -132,6 +136,13 @@ export const Docs: React.FC = () => {
 
         {/* Quick Action Badges */}
         <div className="flex flex-wrap sm:flex-col gap-2.5 shrink-0">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-white transition-all"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <span>Back to Landing Page</span>
+          </Link>
           <a
             href={GITHUB_REPO_URL}
             target="_blank"
@@ -1118,6 +1129,52 @@ def submit_task_for_verification(task_prompt: str, agent_output: str, tx_hash: s
               </div>
             </div>
           )}
+          {/* Topic Pager (Previous / Next Section) */}
+          <div className="pt-8 mt-8 border-t border-[#E8E4DC] flex flex-col sm:flex-row items-center justify-between gap-4">
+            {prevDoc ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveSection(prevDoc.id);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="w-full sm:w-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#E8E4DC] text-xs font-semibold text-[#181311] shadow-2xs transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+                <span>Previous: {prevDoc.label}</span>
+              </button>
+            ) : (
+              <Link
+                to="/"
+                className="w-full sm:w-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#E8E4DC] text-xs font-semibold text-[#181311] shadow-2xs transition-colors"
+              >
+                <span className="material-symbols-outlined text-[16px]">home</span>
+                <span>Back to Landing Page</span>
+              </Link>
+            )}
+
+            {nextDoc ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveSection(nextDoc.id);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-xs font-semibold text-white shadow-sm transition-all cursor-pointer ml-auto"
+              >
+                <span>Next: {nextDoc.label}</span>
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            ) : (
+              <Link
+                to="/verify/new"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#D97736] hover:bg-[#B8621B] text-xs font-semibold text-white shadow-sm transition-all ml-auto"
+              >
+                <span>Run Live Verification</span>
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </Link>
+            )}
+          </div>
         </main>
       </div>
     </div>

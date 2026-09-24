@@ -81,6 +81,20 @@ export const Agents: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto w-full flex flex-col gap-6 font-sans">
+      {/* Top Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-xs text-[#6B635B] flex-wrap">
+        <Link to="/" className="hover:text-[#191513] transition-colors flex items-center gap-1 font-medium">
+          <span className="material-symbols-outlined text-[14px]">home</span>
+          <span>Home</span>
+        </Link>
+        <span>/</span>
+        <Link to="/dashboard" className="hover:text-[#191513] transition-colors">
+          Dashboard
+        </Link>
+        <span>/</span>
+        <span className="text-[#191513] font-semibold">My agents</span>
+      </div>
+
       {/* 1. Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -323,6 +337,44 @@ export const Agents: React.FC = () => {
             ))}
           </div>
         )}
+      </div>
+
+      {/* Navigation Pager */}
+      <div className="pt-6 border-t border-[#E8E4DC] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-[#6B635B]">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/dashboard"
+            className="hover:text-[#191513] transition-colors"
+          >
+            ← Back to Overview
+          </Link>
+          <span>•</span>
+          <Link
+            to="/verifications"
+            className="hover:text-[#191513] transition-colors"
+          >
+            Verification runs
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Link
+            to="/connect-agent"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white font-semibold shadow-xs transition-colors"
+          >
+            <span>Next: Connect new agent</span>
+            <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
+          </Link>
+
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1 text-[#6B635B] hover:text-[#191513] transition-colors font-medium ml-1"
+            title="Return to Landing page"
+          >
+            <span className="material-symbols-outlined text-[15px]">home</span>
+            <span className="hidden sm:inline">Landing page</span>
+          </Link>
+        </div>
       </div>
     </div>
   );

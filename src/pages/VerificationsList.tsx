@@ -1,16 +1,34 @@
-﻿import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useVerificationsList } from "../hooks/useVerification";
 
 export const VerificationsList: React.FC = () => {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const ITEMS_PER_PAGE = 6;
 
   const { verifications, loading, refetch } = useVerificationsList(
     statusFilter,
     searchQuery
   );
+
+  const totalPages = Math.ceil(verifications.length / ITEMS_PER_PAGE) || 1;
+  const paginatedItems = verifications.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handleFilterChange = (val: string) => {
+    setStatusFilter(val);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    setCurrentPage(1);
+  };
 
   const filterTabs = [
     { label: "All", value: "ALL" },
@@ -21,6 +39,20 @@ export const VerificationsList: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full font-sans">
+      {/* Top Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-xs text-[#6B635B]">
+        <Link to="/" className="hover:text-[#181311] transition-colors flex items-center gap-1">
+          <span className="material-symbols-outlined text-[14px]">home</span>
+          <span>Landing Page</span>
+        </Link>
+        <span>/</span>
+        <Link to="/dashboard" className="hover:text-[#181311] transition-colors">
+          Dashboard
+        </Link>
+        <span>/</span>
+        <span className="text-[#181311] font-semibold">Verification runs</span>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191513]">
@@ -57,7 +89,7 @@ export const VerificationsList: React.FC = () => {
           {filterTabs.map((tab) => (
             <button
               key={tab.value}
-              onClick={() => setStatusFilter(tab.value)}
+              onClick={() => handleFilterChange(tab.value)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-heading font-medium transition-colors whitespace-nowrap cursor-pointer ${
                 statusFilter === tab.value
                   ? "bg-[#181311] text-white font-semibold"
@@ -76,7 +108,7 @@ export const VerificationsList: React.FC = () => {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search by ID, agent, or task..."
             className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8E4DC] text-xs text-[#191513] placeholder-[#9E948B] focus:outline-none focus:border-[#181311]"
           />
@@ -112,71 +144,130 @@ export const VerificationsList: React.FC = () => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {verifications.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => navigate(`/verify/${item.id}`)}
-              className="p-5 rounded-2xl bg-white border border-[#E8E4DC] hover:border-[#181311] transition-all flex flex-col justify-between cursor-pointer group shadow-sm hover:shadow-md"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="font-mono text-xs font-bold text-[#D97736]">
-                    #{item.displayId}
-                  </span>
+        <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            {paginatedItems.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => navigate(`/verify/${item.id}`)}
+                className="p-5 rounded-2xl bg-white border border-[#E8E4DC] hover:border-[#181311] transition-all flex flex-col justify-between cursor-pointer group shadow-sm hover:shadow-md"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className="font-mono text-xs font-bold text-[#D97736]">
+                      #{item.displayId}
+                    </span>
 
-                  {item.status === "PASSED" && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#EAF5EE] border border-[#CDE5D5] text-[#1D7A46] font-medium text-[11px]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#1D7A46]" />
-                      <span>VERIFIED</span>
+                    {item.status === "PASSED" && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#EAF5EE] border border-[#CDE5D5] text-[#1D7A46] font-medium text-[11px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#1D7A46]" />
+                        <span>VERIFIED</span>
+                      </span>
+                    )}
+                    {item.status === "FAILED" && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] font-medium text-[11px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626]" />
+                        <span>FAILED</span>
+                      </span>
+                    )}
+                    {item.status === "UNVERIFIED" && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF5EB] border border-[#FADCC4] text-[#B8621B] font-medium text-[11px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#B8621B]" />
+                        <span>UNVERIFIABLE</span>
+                      </span>
+                    )}
+                    {item.status === "RUNNING" && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-medium text-[11px]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                        <span>RUNNING</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 mb-2 text-xs text-[#6B635B]">
+                    <span className="material-symbols-outlined text-[16px] text-[#6B635B]">
+                      smart_toy
                     </span>
-                  )}
-                  {item.status === "FAILED" && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] font-medium text-[11px]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#DC2626]" />
-                      <span>FAILED</span>
+                    <span className="font-heading font-semibold text-[#191513] truncate">
+                      {item.workerName || item.workerId}
                     </span>
-                  )}
-                  {item.status === "UNVERIFIED" && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF5EB] border border-[#FADCC4] text-[#B8621B] font-medium text-[11px]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#B8621B]" />
-                      <span>UNVERIFIABLE</span>
-                    </span>
-                  )}
-                  {item.status === "RUNNING" && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-medium text-[11px]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
-                      <span>RUNNING</span>
-                    </span>
-                  )}
+                  </div>
+
+                  <p className="text-xs text-[#6B635B] line-clamp-3 leading-relaxed mb-4">
+                    {item.taskPrompt}
+                  </p>
                 </div>
 
-                <div className="flex items-center gap-2 mb-2 text-xs text-[#6B635B]">
-                  <span className="material-symbols-outlined text-[16px] text-[#6B635B]">
-                    smart_toy
+                <div className="pt-3 border-t border-[#E8E4DC] flex items-center justify-between text-xs text-[#6B635B]">
+                  <span className="font-mono text-[11px]">
+                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "Recent"}
                   </span>
-                  <span className="font-heading font-semibold text-[#191513] truncate">
-                    {item.workerName || item.workerId}
+
+                  <span className="inline-flex items-center gap-1 text-xs font-heading font-medium text-[#181311] group-hover:text-[#D97736] transition-colors">
+                    <span>Inspect</span>
+                    <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
                   </span>
                 </div>
-
-                <p className="text-xs text-[#6B635B] line-clamp-3 leading-relaxed mb-4">
-                  {item.taskPrompt}
-                </p>
               </div>
+            ))}
+          </div>
 
-              <div className="pt-3 border-t border-[#E8E4DC] flex items-center justify-between text-xs text-[#6B635B]">
-                <span className="font-mono text-[11px]">
-                  {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "Recent"}
-                </span>
+          {/* Pagination Navigation Bar */}
+          {totalPages > 1 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-[#E8E4DC] shadow-sm">
+              <span className="text-xs text-[#6B635B] font-mono">
+                Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, verifications.length)} of {verifications.length} runs
+              </span>
 
-                <span className="inline-flex items-center gap-1 text-xs font-heading font-medium text-[#181311] group-hover:text-[#D97736] transition-colors">
-                  <span>Inspect</span>
-                  <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-                </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentPage((p) => Math.max(1, p - 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  disabled={currentPage === 1}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-[#E8E4DC] bg-white hover:bg-[#FAF8F5] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-[#181311] transition-colors cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[16px]">chevron_left</span>
+                  <span>Previous</span>
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      onClick={() => {
+                        setCurrentPage(page);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className={`w-8 h-8 rounded-xl text-xs font-mono font-semibold transition-colors cursor-pointer ${
+                        currentPage === page
+                          ? "bg-[#181311] text-white"
+                          : "bg-white border border-[#E8E4DC] text-[#6B635B] hover:text-[#181311] hover:bg-[#FAF8F5]"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentPage((p) => Math.min(totalPages, p + 1));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  disabled={currentPage === totalPages}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-[#E8E4DC] bg-white hover:bg-[#FAF8F5] disabled:opacity-30 disabled:cursor-not-allowed text-xs font-semibold text-[#181311] transition-colors cursor-pointer"
+                >
+                  <span>Next</span>
+                  <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+                </button>
               </div>
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>

@@ -60,12 +60,17 @@ export const VerificationProcessing: React.FC = () => {
     <div className="max-w-2xl mx-auto w-full flex flex-col gap-6 font-sans pb-12">
       {/* Header */}
       <div>
-        <div className="flex items-center gap-2 text-xs text-[#6B635B] mb-2">
-          <Link to="/dashboard" className="hover:text-[#181311] transition-colors">
-            Overview
+        <div className="flex items-center gap-2 text-xs text-[#6B635B] mb-2 flex-wrap">
+          <Link to="/" className="hover:text-[#181311] transition-colors flex items-center gap-1 font-medium">
+            <span className="material-symbols-outlined text-[14px]">home</span>
+            <span>Home</span>
           </Link>
           <span>/</span>
-          <span className="text-[#6B635B]">Active check</span>
+          <Link to="/dashboard" className="hover:text-[#181311] transition-colors">
+            Dashboard
+          </Link>
+          <span>/</span>
+          <span className="text-[#181311] font-semibold">Active check</span>
         </div>
         <h1 className="font-heading text-2xl sm:text-3xl font-extrabold tracking-tight text-[#181311]">
           Verification in progress

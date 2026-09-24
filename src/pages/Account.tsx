@@ -144,7 +144,14 @@ export const Account: React.FC = () => {
               Sign in with your Google account to manage programmatic verification keys and agent connections.
             </p>
           </div>
-          <div className="pt-2">
+          <div className="pt-2 flex items-center gap-3">
+            <Link
+              to="/"
+              className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-[16px]">home</span>
+              <span>Back to Landing Page</span>
+            </Link>
             <Button
               variant="primary"
               size="md"
@@ -161,6 +168,20 @@ export const Account: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto w-full flex flex-col gap-6 font-sans">
+      {/* Top Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-xs text-[#8C8479] flex-wrap">
+        <Link to="/" className="hover:text-[#FFF8F0] transition-colors flex items-center gap-1 font-medium">
+          <span className="material-symbols-outlined text-[14px]">home</span>
+          <span>Home</span>
+        </Link>
+        <span>/</span>
+        <Link to="/dashboard" className="hover:text-[#FFF8F0] transition-colors">
+          Dashboard
+        </Link>
+        <span>/</span>
+        <span className="text-[#FFF8F0] font-semibold">Account settings</span>
+      </div>
+
       {/* Header Profile Bar */}
       <div className="p-6 rounded-3xl bg-[#21110B] border border-[#4A2819] flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useVerificationsList } from "../hooks/useVerification";
 import { useAuth } from "../context/AuthContext";
 import { StellarWalletModal } from "../components/wallet/StellarWalletModal";
@@ -32,6 +32,16 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto w-full font-sans">
+      {/* Top Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-xs text-[#6B635B]">
+        <Link to="/" className="hover:text-[#181311] transition-colors flex items-center gap-1">
+          <span className="material-symbols-outlined text-[14px]">home</span>
+          <span>Landing Page</span>
+        </Link>
+        <span>/</span>
+        <span className="text-[#181311] font-semibold">Overview</span>
+      </div>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

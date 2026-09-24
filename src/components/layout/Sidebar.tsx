@@ -37,6 +37,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
       path: "/evidence",
       active: location.pathname === "/evidence" || location.pathname.includes("/evidence"),
     },
+    {
+      label: "Documentation",
+      icon: "menu_book",
+      path: "/docs",
+      active: location.pathname === "/docs",
+    },
+    {
+      label: "Landing page",
+      icon: "home",
+      path: "/",
+      active: location.pathname === "/",
+    },
   ];
 
   return (

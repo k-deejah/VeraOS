@@ -18,6 +18,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
     { label: "My agents", icon: "smart_toy", path: "/agents" },
     { label: "Verification runs", icon: "verified", path: "/verifications" },
     { label: "Evidence library", icon: "folder_open", path: "/evidence" },
+    { label: "Documentation", icon: "menu_book", path: "/docs" },
+    { label: "Landing page", icon: "home", path: "/" },
   ];
 
   return (

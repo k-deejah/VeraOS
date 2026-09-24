@@ -103,12 +103,21 @@ export const VerificationDetail: React.FC = () => {
     <div className="max-w-4xl mx-auto w-full flex flex-col gap-6 font-sans pb-16">
       {/* Top Breadcrumb */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-xs text-[#6B635B]">
+        <div className="flex items-center gap-2 text-xs text-[#6B635B] flex-wrap">
+          <Link to="/" className="hover:text-[#181311] transition-colors flex items-center gap-1">
+            <span className="material-symbols-outlined text-[14px]">home</span>
+            <span>Landing Page</span>
+          </Link>
+          <span>/</span>
           <Link to="/dashboard" className="hover:text-[#181311] transition-colors">
+            Dashboard
+          </Link>
+          <span>/</span>
+          <Link to="/verifications" className="hover:text-[#181311] transition-colors">
             Verifications
           </Link>
           <span>/</span>
-          <span className="font-mono text-[#181311]">{runId}</span>
+          <span className="font-mono text-[#181311] font-semibold">{runId}</span>
         </div>
 
         {explorerUrl && (
@@ -338,6 +347,43 @@ export const VerificationDetail: React.FC = () => {
             })
           ) : (
             <p className="text-xs text-[#6B635B] py-3">No invariant records registered.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Next Step & Navigation Pager */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+        <Link
+          to="/verifications"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#E8E4DC] text-xs font-semibold text-[#181311] shadow-2xs transition-colors"
+        >
+          <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span>Back to all verifications</span>
+        </Link>
+
+        <div className="w-full sm:w-auto flex items-center gap-2.5">
+          <Link
+            to={id ? `/verify/${id}/evidence` : "/evidence"}
+            className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#E8E4DC] text-xs font-semibold text-[#181311] shadow-2xs transition-colors"
+          >
+            <span className="material-symbols-outlined text-[16px]">folder_open</span>
+            <span>Inspect Evidence ({evidenceList.length}) →</span>
+          </Link>
+
+          {!isPassed ? (
+            <Link
+              to={id ? `/verify/${id}/correction` : "/verify/new"}
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-xs font-semibold text-white shadow-sm transition-all"
+            >
+              <span>Next: Remediate Discrepancy →</span>
+            </Link>
+          ) : (
+            <Link
+              to="/verify/new"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#D97736] hover:bg-[#B8621B] text-xs font-semibold text-white shadow-sm transition-all"
+            >
+              <span>Check another task →</span>
+            </Link>
           )}
         </div>
       </div>
