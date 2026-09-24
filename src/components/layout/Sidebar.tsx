@@ -108,8 +108,33 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
         </nav>
       </div>
 
-      {/* Account / Operator Footer */}
-      <div className="p-4 border-t border-[#2A2320]">
+      {/* Web3 Network Telemetry & Account / Operator Footer */}
+      <div className="p-4 border-t border-[#2A2320] flex flex-col gap-2.5">
+        {/* On-Chain Network Status */}
+        <div className="p-2.5 rounded-xl bg-[#201A18] border border-[#2A2320] flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#1D7A46] animate-pulse" />
+            <div className="flex flex-col">
+              <span className="font-mono text-[10px] text-white font-semibold leading-tight">
+                Stellar Testnet
+              </span>
+              <span className="font-mono text-[9px] text-[#9E948B] leading-tight">
+                Protocol 21 · Horizon RPC
+              </span>
+            </div>
+          </div>
+          <a
+            href="https://stellar.expert/explorer/testnet"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open Stellar Expert Explorer"
+            className="text-[#9E948B] hover:text-[#D97736] p-1 transition-colors"
+          >
+            <span className="material-symbols-outlined text-[15px]">open_in_new</span>
+          </a>
+        </div>
+
+        {/* User Account */}
         <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#201A18] border border-[#2A2320]">
           <Link
             to="/account"
@@ -142,7 +167,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
                 {user?.name || "Operator"}
               </p>
               <p className="font-mono text-[10px] text-[#9E948B] truncate">
-                {user?.email || "Signed In"}
+                {user?.walletAddress
+                  ? `${user.walletAddress.slice(0, 4)}...${user.walletAddress.slice(-4)}`
+                  : user?.email || "Signed In"}
               </p>
             </div>
           </Link>

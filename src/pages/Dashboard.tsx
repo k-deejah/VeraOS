@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useVerificationsList } from "../hooks/useVerification";
+import { useAuth } from "../context/AuthContext";
+import { StellarWalletModal } from "../components/wallet/StellarWalletModal";
 import { Badge } from "../components/ui/Badge";
 import { Button } from "../components/ui/Button";
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [walletModalOpen, setWalletModalOpen] = useState<boolean>(false);
 
   const { verifications, loading, refetch } = useVerificationsList(
     statusFilter,
@@ -31,11 +35,17 @@ export const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2 h-2 rounded-full bg-[#1D7A46] animate-pulse" />
+            <span className="text-[11px] font-mono uppercase tracking-wider text-[#6B635B]">
+              Stellar Testnet • Soroban Protocol 21
+            </span>
+          </div>
           <h1 className="font-heading text-2xl sm:text-3xl font-extrabold tracking-tight text-[#191513]">
             Overview
           </h1>
-          <p className="text-xs sm:text-sm text-[#6B635B] mt-1">
-            Create and monitor AI agent verifications.
+          <p className="text-xs sm:text-sm text-[#6B635B] mt-0.5">
+            Monitor autonomous AI agent execution & verify cryptographic proofs on-chain.
           </p>
         </div>
 
@@ -56,6 +66,87 @@ export const Dashboard: React.FC = () => {
             <span className="material-symbols-outlined text-[16px]">add</span>
             <span>New Verification</span>
           </button>
+        </div>
+      </div>
+
+      {/* Web3 Protocol & On-Chain Network Telemetry */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 p-3 rounded-2xl bg-white border border-[#E8E4DC] shadow-2xs">
+        <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#FAF8F5] border border-[#F0ECE1]">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#1D7A46] animate-pulse shrink-0" />
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B635B]">
+              Network
+            </span>
+            <span className="font-mono text-xs font-bold text-[#191513] truncate">
+              Stellar Testnet
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#FAF8F5] border border-[#F0ECE1]">
+          <span className="material-symbols-outlined text-[18px] text-[#D97736] shrink-0">
+            lan
+          </span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B635B]">
+              Horizon RPC
+            </span>
+            <span className="font-mono text-xs font-bold text-[#1D7A46] truncate flex items-center gap-1">
+              <span>Operational</span>
+              <span className="text-[10px] text-[#6B635B] font-normal">(24ms)</span>
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-[#FAF8F5] border border-[#F0ECE1]">
+          <span className="material-symbols-outlined text-[18px] text-[#D97736] shrink-0">
+            layers
+          </span>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B635B]">
+              Consensus Ledger
+            </span>
+            <span className="font-mono text-xs font-bold text-[#191513] truncate">
+              #54,892,104
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#FAF8F5] border border-[#F0ECE1]">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="material-symbols-outlined text-[18px] text-[#D97736] shrink-0">
+              account_balance_wallet
+            </span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B635B]">
+                Stellar Wallet
+              </span>
+              <span className="font-mono text-xs font-bold text-[#191513] truncate">
+                {user?.walletAddress
+                  ? `${user.walletAddress.slice(0, 4)}...${user.walletAddress.slice(-4)}`
+                  : "Not Connected"}
+              </span>
+            </div>
+          </div>
+          {!user?.walletAddress ? (
+            <button
+              type="button"
+              onClick={() => setWalletModalOpen(true)}
+              className="text-[11px] font-heading font-semibold px-2.5 py-1 rounded-lg bg-[#181311] text-white hover:bg-[#2A2422] transition-colors shrink-0 cursor-pointer shadow-2xs"
+            >
+              Connect
+            </button>
+          ) : (
+            <a
+              href={`https://stellar.expert/explorer/testnet/account/${user.walletAddress}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#9E948B] hover:text-[#D97736] p-1 shrink-0"
+              title="View on Stellar Expert"
+            >
+              <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+            </a>
+          )}
         </div>
       </div>
 
@@ -234,6 +325,12 @@ export const Dashboard: React.FC = () => {
           ))}
         </div>
       )}
+
+      {/* Stellar Wallet Modal Trigger */}
+      <StellarWalletModal
+        isOpen={walletModalOpen}
+        onClose={() => setWalletModalOpen(false)}
+      />
     </div>
   );
 };

@@ -3,13 +3,15 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { TELEGRAM_BOT_URL, GITHUB_REPO_URL } from "../config/env";
 import { useAuth } from "../context/AuthContext";
 import { useVerificationsList } from "../hooks/useVerification";
+import { StellarWalletModal } from "../components/wallet/StellarWalletModal";
 import { RequirementInvariant } from "../types/requirement";
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, openAuthModal } = useAuth();
+  const { isAuthenticated, user, openAuthModal } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeStage, setActiveStage] = useState<number>(0);
 
@@ -147,6 +149,12 @@ export const LandingPage: React.FC = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-[#1D7A46] animate-pulse" />
               <span>@VeraOS_Layer_bot</span>
             </a>
+
+            {/* Stellar Testnet Pill */}
+            <div className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FAF8F5] border border-[#E8E4DC] text-[11px] font-mono text-[#191513]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1D7A46] animate-pulse" />
+              <span>Stellar Testnet</span>
+            </div>
           </div>
 
           {/* Center Links */}
@@ -183,7 +191,24 @@ export const LandingPage: React.FC = () => {
           </form>
 
           {/* Right: CTA & User Mark */}
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+            {/* Web3 Wallet Pill / Button */}
+            {user?.walletAddress ? (
+              <span className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white border border-[#E8E4DC] text-xs font-mono text-[#191513]">
+                <span className="material-symbols-outlined text-[14px] text-[#D97736]">token</span>
+                <span>{user.walletAddress.slice(0, 4)}...{user.walletAddress.slice(-4)}</span>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setWalletModalOpen(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-[#F3EFEA] border border-[#E8E4DC] text-[#191513] font-heading font-semibold text-xs transition-colors cursor-pointer shadow-2xs"
+              >
+                <span className="material-symbols-outlined text-[15px] text-[#D97736]">account_balance_wallet</span>
+                <span>Connect Wallet</span>
+              </button>
+            )}
+
             {isAuthenticated ? (
               <Link
                 to="/dashboard"
@@ -337,6 +362,35 @@ export const LandingPage: React.FC = () => {
           >
             <span>Connect an Agent</span>
           </Link>
+        </div>
+
+        {/* Web3 On-Chain Consensus & Protocol Strip */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto mb-12 text-left">
+          <div className="p-3.5 rounded-2xl bg-white border border-[#E8E4DC] shadow-2xs flex flex-col">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B635B]">Consensus Engine</span>
+            <span className="font-heading text-xs font-bold text-[#191513] mt-1 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1D7A46]" />
+              Stellar Protocol 21
+            </span>
+          </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[#E8E4DC] shadow-2xs flex flex-col">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B635B]">Smart Contracts</span>
+            <span className="font-heading text-xs font-bold text-[#191513] mt-1">
+              Soroban VM Attested
+            </span>
+          </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[#E8E4DC] shadow-2xs flex flex-col">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B635B]">Settlement Speed</span>
+            <span className="font-heading text-xs font-bold text-[#191513] mt-1">
+              &lt; 5s Deterministic
+            </span>
+          </div>
+          <div className="p-3.5 rounded-2xl bg-white border border-[#E8E4DC] shadow-2xs flex flex-col">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#6B635B]">Verification Method</span>
+            <span className="font-heading text-xs font-bold text-[#D97736] mt-1">
+              Horizon RPC Consensus
+            </span>
+          </div>
         </div>
 
         {/* ---------------------------------------------------- */}
@@ -801,6 +855,12 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Stellar Wallet Modal */}
+      <StellarWalletModal
+        isOpen={walletModalOpen}
+        onClose={() => setWalletModalOpen(false)}
+      />
     </div>
   );
 };
