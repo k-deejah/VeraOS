@@ -9,6 +9,9 @@ import { ProtectedRoute } from "../components/auth/ProtectedRoute";
 const LandingPage = lazy(() =>
   import("../pages/LandingPage").then((m) => ({ default: m.LandingPage }))
 );
+const GetStarted = lazy(() =>
+  import("../pages/GetStarted").then((m) => ({ default: m.GetStarted }))
+);
 const AuthCallback = lazy(() =>
   import("../pages/AuthCallback").then((m) => ({ default: m.AuthCallback }))
 );
@@ -101,7 +104,16 @@ export const router = createBrowserRouter([
       },
       {
         path: "/get-started",
-        element: <Navigate to="/welcome" replace />,
+        errorElement: <RouteErrorFallback />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <GetStarted />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/login",
+        element: <Navigate to="/get-started" replace />,
       },
       {
         path: "/invite",

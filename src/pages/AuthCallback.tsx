@@ -19,7 +19,22 @@ export const AuthCallback: React.FC = () => {
       }
 
       try {
-        // Supabase auto-detects hash and code query params
+        const searchParams = new URLSearchParams(window.location.search);
+        const urlError = searchParams.get("error_description") || searchParams.get("error");
+        if (urlError) {
+          throw new Error(urlError);
+        }
+
+        // If PKCE auth code is present, exchange it for session
+        const code = searchParams.get("code");
+        if (code) {
+          const { error: codeErr } = await supabase.auth.exchangeCodeForSession(code);
+          if (codeErr) {
+            console.warn("[AuthCallback] exchangeCodeForSession notice:", codeErr.message);
+          }
+        }
+
+        // Retrieve current active session
         const { data, error: sessionErr } = await supabase.auth.getSession();
 
         if (sessionErr) {

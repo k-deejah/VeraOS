@@ -108,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
         </nav>
       </div>
 
-      {/* Account / Workspace Footer */}
+      {/* Account / Operator Footer */}
       <div className="p-4 border-t border-[#2A2320]">
         <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#201A18] border border-[#2A2320]">
           <Link
@@ -116,15 +116,33 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
             onClick={onCloseMobile}
             className="flex items-center gap-2.5 min-w-0 flex-1 hover:opacity-90 transition-opacity"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#2D2421] border border-[#3D322E] text-[#D97736] flex items-center justify-center font-heading font-bold text-xs shrink-0">
-              AO
-            </div>
+            {user?.avatar ? (
+              <img
+                src={user.avatar}
+                alt={user.name || "Operator"}
+                className="w-8 h-8 rounded-lg object-cover border border-[#3D322E] shrink-0"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-[#2D2421] border border-[#3D322E] text-[#D97736] flex items-center justify-center font-heading font-bold text-xs shrink-0">
+                {user?.name
+                  ? user.name
+                      .split(" ")
+                      .map((p) => p[0])
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .join("")
+                      .toUpperCase()
+                  : user?.email
+                  ? user.email.slice(0, 2).toUpperCase()
+                  : "OP"}
+              </div>
+            )}
             <div className="truncate">
               <p className="font-heading font-semibold text-xs text-white truncate">
-                Acme Operations
+                {user?.name || "Operator"}
               </p>
               <p className="font-mono text-[10px] text-[#9E948B] truncate">
-                {user?.email || "maya@acme.ai"}
+                {user?.email || "Signed In"}
               </p>
             </div>
           </Link>

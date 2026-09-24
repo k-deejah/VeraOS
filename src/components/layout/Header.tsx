@@ -68,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
           <span>All systems operational</span>
         </div>
 
-        {/* User Account / Maya Chen Avatar */}
+        {/* User Account Avatar */}
         <div className="relative">
           <button
             type="button"
@@ -79,12 +79,22 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
             {user?.avatar ? (
               <img
                 src={user.avatar}
-                alt={user.name || "Maya Chen"}
+                alt={user.name || "Operator"}
                 className="w-8 h-8 rounded-full object-cover border border-[#E8E4DC]"
               />
             ) : (
               <div className="w-8 h-8 rounded-full bg-[#181311] text-[#F7F5F0] flex items-center justify-center font-heading font-medium text-xs">
-                MC
+                {user?.name
+                  ? user.name
+                      .split(" ")
+                      .map((p) => p[0])
+                      .filter(Boolean)
+                      .slice(0, 2)
+                      .join("")
+                      .toUpperCase()
+                  : user?.email
+                  ? user.email.slice(0, 2).toUpperCase()
+                  : "OP"}
               </div>
             )}
             <span className="sr-only">Toggle user menu</span>
@@ -94,10 +104,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
             <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white border border-[#E8E4DC] shadow-lg p-2 z-50 flex flex-col gap-1 text-xs">
               <div className="px-3 py-2 border-b border-[#E8E4DC] mb-1">
                 <p className="font-heading font-semibold text-[#191513] truncate">
-                  {user?.name || "Maya Chen"}
+                  {user?.name || "Operator"}
                 </p>
                 <p className="font-mono text-[10px] text-[#6B635B] truncate">
-                  {user?.email || "maya@acme.ai"}
+                  {user?.email || ""}
                 </p>
               </div>
 

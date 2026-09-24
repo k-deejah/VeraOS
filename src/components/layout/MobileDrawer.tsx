@@ -106,15 +106,33 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
                 onClick={onClose}
                 className="flex items-center gap-2.5 p-2 rounded-xl bg-[#201A18] border border-[#2A2320]"
               >
-                <div className="w-8 h-8 rounded-lg bg-[#2D2421] border border-[#3D322E] text-[#D97736] flex items-center justify-center font-heading font-bold text-xs">
-                  AO
-                </div>
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name || "Operator"}
+                    className="w-8 h-8 rounded-lg object-cover border border-[#3D322E] shrink-0"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-lg bg-[#2D2421] border border-[#3D322E] text-[#D97736] flex items-center justify-center font-heading font-bold text-xs shrink-0">
+                    {user.name
+                      ? user.name
+                          .split(" ")
+                          .map((p) => p[0])
+                          .filter(Boolean)
+                          .slice(0, 2)
+                          .join("")
+                          .toUpperCase()
+                      : user.email
+                      ? user.email.slice(0, 2).toUpperCase()
+                      : "OP"}
+                  </div>
+                )}
                 <div className="truncate flex-1">
                   <p className="font-heading font-semibold text-xs text-white truncate">
-                    Acme Operations
+                    {user.name || "Operator"}
                   </p>
                   <p className="font-mono text-[10px] text-[#9E948B] truncate">
-                    {user.email || "maya@acme.ai"}
+                    {user.email || ""}
                   </p>
                 </div>
               </Link>
@@ -132,11 +150,11 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
             </div>
           ) : (
             <Link
-              to="/welcome"
+              to="/get-started"
               onClick={onClose}
               className="w-full text-center py-2.5 rounded-xl bg-[#F3E8DC] text-[#181311] font-heading font-semibold text-xs block"
             >
-              Sign In
+              Get Started
             </Link>
           )}
         </div>

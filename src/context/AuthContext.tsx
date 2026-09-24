@@ -30,19 +30,12 @@ interface AuthContextType {
   openAuthModal: (mode?: "signin" | "signup") => void;
   closeAuthModal: () => void;
   login: (email: string, pass: string) => Promise<boolean>;
-  loginWithGoogle: (options?: {
-    credential?: string;
-    accessToken?: string;
-    email?: string;
-    name?: string;
-    picture?: string;
-    sub?: string;
-  }) => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
   signup: (name: string, email: string, pass: string) => Promise<boolean>;
   connectWallet: (customAddress?: string) => Promise<boolean>;
   redeemInviteCode: (code: string) => Promise<{ success: boolean; message: string }>;
   loginWithOtp: (email: string, otp: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateProfile: (data: { name?: string; role?: string }) => Promise<boolean>;
   regenerateApiKey: () => Promise<string>;
   updatePassword: (currentPass: string, newPass: string) => Promise<boolean>;
@@ -72,33 +65,9 @@ function saveStoredUsers(users: StoredAccount[]): void {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const DEFAULT_DEMO_USER: User = {
-  id: "usr_maya_chen_01",
-  name: "Maya Chen",
-  email: "maya@acme.ai",
-  role: "Security Engineer",
-  avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80",
-  invitationStatus: "admin",
-  apiKey: "vera_live_sec_89bf2e91a001",
-  walletAddress: "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5",
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [loading, setLoading] = useState<boolean>(() => {
-    return isSupabaseConfigured;
-  });
-
-  const [user, setUser] = useState<User | null>(() => {
-    try {
-      if (localStorage.getItem("vera_logged_out") === "1") {
-        return null;
-      }
-      const stored = localStorage.getItem(STORAGE_AUTH_KEY);
-      return stored ? JSON.parse(stored) : (isSupabaseConfigured ? null : DEFAULT_DEMO_USER);
-    } catch {
-      return isSupabaseConfigured ? null : DEFAULT_DEMO_USER;
-    }
-  });
+  const [loading, setLoading] = useState<boolean>(true);
+  const [user, setUser] = useState<User | null>(null);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signup");
@@ -416,97 +385,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const loginWithGoogle = async (options?: {
-    credential?: string;
-    accessToken?: string;
-    email?: string;
-    name?: string;
-    picture?: string;
-    sub?: string;
-  }): Promise<boolean> => {
-    // Real Supabase Google OAuth
-    if (isSupabaseConfigured) {
-      const { error } = await supabaseAuthService.signInWithGoogle();
-      if (error) {
-        console.error("[AuthContext] Supabase Google OAuth error:", error);
-        throw error;
-      }
-      return true;
+  const loginWithGoogle = async (): Promise<boolean> => {
+    if (!isSupabaseConfigured) {
+      throw new Error(
+        "Supabase is not configured. Please ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set."
+      );
     }
-
-    const targetEmail = (options?.email || "").trim().toLowerCase();
-    const targetName = options?.name || (targetEmail ? targetEmail.split("@")[0] : "Google Operator");
-
-    try {
-      const payload: Record<string, unknown> = {};
-      if (options?.credential) payload.idToken = options.credential;
-      if (options?.accessToken) payload.accessToken = options.accessToken;
-      if (targetEmail) payload.email = targetEmail;
-      if (targetName) payload.name = targetName;
-      if (options?.picture) payload.picture = options.picture;
-      if (options?.sub) payload.sub = options.sub;
-
-      const res = await fetch("/v1/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (res.ok) {
-        const data = (await res.json()) as any;
-        if (data.token) {
-          localStorage.setItem("vera_session_token_v1", data.token);
-        }
-
-        const activeUser: User = {
-          id: data.user.id,
-          name: data.user.name,
-          email: data.user.email,
-          role: data.user.role,
-          avatar: data.user.avatar,
-          walletAddress: data.user.stellar_wallet,
-          authProvider: "google",
-          googleId: data.user.google_id,
-          invitationStatus:
-            data.user.invitation_status || (data.isOwner ? "admin" : data.isInvited ? "invited" : "invited"),
-          createdAt: data.user.created_at,
-        };
-
-        setUser(activeUser);
-        setIsAuthModalOpen(false);
-        return true;
-      }
-    } catch (apiErr) {
-      console.warn("[AuthContext] /v1/auth/google API request unreachable, activating resilient Google auth:", apiErr);
+    const { error } = await supabaseAuthService.signInWithGoogle();
+    if (error) {
+      console.error("[AuthContext] Supabase Google OAuth error:", error);
+      throw error;
     }
-
-    // Resilient local Google authentication (guarantees sign-in succeeds immediately)
-    const effectiveEmail = targetEmail || "operator@veraos.network";
-    const isOwner = effectiveEmail === "owner@veraos.network" || effectiveEmail.endsWith("@veraos.network");
-    const activeUser: User = {
-      id: `usr_g_${btoa(effectiveEmail).replace(/[^a-zA-Z0-9]/g, "").slice(0, 8)}_${Date.now().toString(36)}`,
-      name: targetName,
-      email: effectiveEmail,
-      role: isOwner ? "Admin" : "Operator",
-      avatar: options?.picture,
-      authProvider: "google",
-      googleId: options?.sub || `g_sub_${Date.now()}`,
-      invitationStatus: isOwner ? "admin" : "invited",
-      createdAt: new Date().toISOString(),
-    };
-
-    const users = getStoredUsers();
-    const existingIdx = users.findIndex((u) => u.email.toLowerCase() === effectiveEmail.toLowerCase());
-    if (existingIdx >= 0) {
-      users[existingIdx] = { ...users[existingIdx], ...activeUser, passwordHash: "GOOGLE_OAUTH" };
-    } else {
-      users.push({ ...activeUser, passwordHash: "GOOGLE_OAUTH" });
-    }
-    saveStoredUsers(users);
-    localStorage.setItem("vera_session_token_v1", `local_token_${Date.now()}`);
-
-    setUser(activeUser);
-    setIsAuthModalOpen(false);
     return true;
   };
 
@@ -600,6 +489,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const refetchUser = async () => {
+    if (isSupabaseConfigured) {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (session?.user) {
+          const profile = await supabaseAuthService.syncUserProfile(session.user);
+          const activeUser: User = {
+            id: session.user.id,
+            name:
+              profile?.full_name ||
+              session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              session.user.email?.split("@")[0] ||
+              "Operator",
+            email: session.user.email || "",
+            role: profile?.role || "operator",
+            avatar:
+              profile?.avatar_url ||
+              session.user.user_metadata?.avatar_url ||
+              session.user.user_metadata?.picture,
+            walletAddress: profile?.stellar_wallet || undefined,
+            authProvider: "google",
+            googleId: session.user.id,
+            invitationStatus: "invited",
+            createdAt: profile?.created_at || session.user.created_at,
+            apiKey: profile?.api_key || `vera_live_${session.user.id.slice(0, 8)}`,
+          };
+          setUser(activeUser);
+          return;
+        }
+      } catch (err) {
+        console.warn("refetchUser Supabase error:", err);
+      }
+    }
+
     if (!user) return;
     try {
       const res = await fetch(`/v1/auth/me?email=${encodeURIComponent(user.email)}`);
@@ -717,9 +642,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const logout = () => {
+  const logout = async (): Promise<void> => {
     if (isSupabaseConfigured) {
-      supabaseAuthService.signOut().catch((err) => console.warn("Supabase signOut error:", err));
+      try {
+        await supabaseAuthService.signOut();
+      } catch (err) {
+        console.warn("Supabase signOut error:", err);
+      }
     }
     setUser(null);
     try {
@@ -728,6 +657,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem("vera_session_token_v1");
     } catch {
       // ignore
+    }
+    if (typeof window !== "undefined") {
+      window.location.href = "/";
     }
   };
 

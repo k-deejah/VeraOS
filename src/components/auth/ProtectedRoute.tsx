@@ -24,8 +24,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    // Redirect unauthenticated visitors back to the landing page with original destination saved
-    return <Navigate to="/" state={{ from: location, openAuth: true }} replace />;
+    // Redirect unauthenticated visitors to the Google sign-in page with original destination saved
+    return <Navigate to="/get-started" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;

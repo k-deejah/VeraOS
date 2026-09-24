@@ -1,77 +1,23 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { Button } from "../ui/Button";
 
 export const AuthModal: React.FC = () => {
   const { isAuthModalOpen, closeAuthModal, loginWithGoogle } = useAuth();
-  const navigate = useNavigate();
-
-  const [googleEmail, setGoogleEmail] = useState("");
-  const [showManualInput, setShowManualInput] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   if (!isAuthModalOpen) return null;
 
-  const handleGoogleLogin = async (customEmail?: string) => {
+  const handleGoogleLogin = async () => {
     setErrorMsg(null);
     setIsSubmitting(true);
 
     try {
-      if (customEmail) {
-        await loginWithGoogle({ email: customEmail.trim().toLowerCase() });
-        closeAuthModal();
-        navigate("/dashboard");
-        return;
-      }
-
-      const win = typeof window !== "undefined" ? (window as any) : {};
-      const clientId = ((import.meta as any).env?.VITE_GOOGLE_CLIENT_ID || "").trim();
-
-      if (clientId && win.google?.accounts?.oauth2) {
-        try {
-          const client = win.google.accounts.oauth2.initTokenClient({
-            client_id: clientId,
-            scope: "email profile openid",
-            prompt: "select_account",
-            callback: async (resp: any) => {
-              if (resp.error) {
-                setErrorMsg(resp.error_description || "Google authentication was cancelled.");
-                setIsSubmitting(false);
-                return;
-              }
-              try {
-                await loginWithGoogle({ accessToken: resp.access_token });
-                closeAuthModal();
-                navigate("/dashboard");
-              } catch (err: any) {
-                setErrorMsg(err?.message || "Google authentication failed.");
-              } finally {
-                setIsSubmitting(false);
-              }
-            },
-            error_callback: (err: any) => {
-              console.warn("[AuthModal] GSI error callback:", err);
-              setIsSubmitting(false);
-              setShowManualInput(true);
-            },
-          });
-          client.requestAccessToken();
-          return;
-        } catch (err) {
-          console.warn("[AuthModal] GSI error:", err);
-        }
-      }
-
-      // Trigger Supabase Google OAuth (or fallback)
       await loginWithGoogle();
-      closeAuthModal();
-      navigate("/dashboard");
+      // On browser redirect to Google OAuth, execution stops
     } catch (err: any) {
-      setErrorMsg(err?.message || "Google authentication failed.");
-      setShowManualInput(true);
-    } finally {
+      console.error("[AuthModal] Google OAuth error:", err);
+      setErrorMsg(err?.message || "Google OAuth failed. Please check Supabase configuration.");
       setIsSubmitting(false);
     }
   };
@@ -154,52 +100,12 @@ export const AuthModal: React.FC = () => {
             </svg>
             <span>{isSubmitting ? "Connecting to Google..." : "Continue with Google"}</span>
           </button>
-
-          {showManualInput ? (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (googleEmail && googleEmail.includes("@")) {
-                  handleGoogleLogin(googleEmail);
-                } else {
-                  setErrorMsg("Please enter a valid Google email address.");
-                }
-              }}
-              className="flex flex-col gap-2 p-3.5 rounded-xl bg-[#160C08] border border-[#4A2B1D] mt-1"
-            >
-              <label className="text-xs font-medium text-[#FFF8F0]">
-                Enter Google Account Email
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  value={googleEmail}
-                  onChange={(e) => setGoogleEmail(e.target.value)}
-                  placeholder="name@gmail.com or company account"
-                  autoFocus
-                  required
-                  className="flex-1 px-3 py-2 rounded-xl bg-[#21110B] border border-[#4A2B1D] text-xs text-[#FFF8F0] placeholder-[#B9A99B]/40 focus:outline-none focus:ring-1 focus:ring-[#E08A3E]"
-                />
-                <Button type="submit" variant="primary" size="sm" loading={isSubmitting}>
-                  Sign In
-                </Button>
-              </div>
-            </form>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setShowManualInput(true)}
-              className="text-[11px] text-[#B9A99B] hover:text-[#FFF8F0] underline text-center cursor-pointer mt-1 font-mono"
-            >
-              Enter Google email manually
-            </button>
-          )}
         </div>
 
         <div className="pt-4 border-t border-[#4A2B1D] flex items-center justify-between text-[11px] text-[#B9A99B]">
           <span className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#4ade80]" />
-            Google authentication only
+            Real Google OAuth via Supabase
           </span>
           <span className="font-mono text-[#E08A3E]">VeraOS</span>
         </div>

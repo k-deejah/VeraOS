@@ -8,7 +8,7 @@ import { RequirementInvariant } from "../types/requirement";
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { openAuthModal } = useAuth();
+  const { isAuthenticated, openAuthModal } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeStage, setActiveStage] = useState<number>(0);
@@ -19,9 +19,11 @@ export const LandingPage: React.FC = () => {
 
   useEffect(() => {
     if ((location.state as any)?.openAuth) {
-      openAuthModal("signin");
+      if (!isAuthenticated) {
+        navigate("/get-started");
+      }
     }
-  }, [location.state, openAuthModal]);
+  }, [location.state, isAuthenticated, navigate]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,22 +172,32 @@ export const LandingPage: React.FC = () => {
             />
           </form>
 
-          {/* Right: Connect Agent CTA & User Mark */}
+          {/* Right: CTA & User Mark */}
           <div className="flex items-center gap-3 shrink-0">
-            <Link
-              to="/connect-agent"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white font-heading font-semibold text-xs sm:text-sm shadow-sm transition-all"
-            >
-              <span>Connect an Agent</span>
-              <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white font-heading font-semibold text-xs sm:text-sm shadow-sm transition-all"
+              >
+                <span>Dashboard</span>
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </Link>
+            ) : (
+              <Link
+                to="/get-started"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white font-heading font-semibold text-xs sm:text-sm shadow-sm transition-all"
+              >
+                <span>Get Started</span>
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </Link>
+            )}
 
             <Link
-              to="/dashboard"
+              to={isAuthenticated ? "/dashboard" : "/get-started"}
               className="w-8 h-8 rounded-full bg-[#EAE5DE] border border-[#D5CEC5] text-[#191513] flex items-center justify-center font-heading font-semibold text-xs hover:border-[#181311] transition-colors"
-              title="Dashboard"
+              title={isAuthenticated ? "Dashboard" : "Get Started"}
             >
-              VO
+              {isAuthenticated ? "VO" : <span className="material-symbols-outlined text-[16px]">login</span>}
             </Link>
 
             {/* Mobile Hamburger */}
@@ -255,6 +267,25 @@ export const LandingPage: React.FC = () => {
               <span className="w-1.5 h-1.5 rounded-full bg-[#1D7A46]" />
               <span>Telegram Bot (@VeraOS_Layer_bot)</span>
             </a>
+            {isAuthenticated ? (
+              <Link
+                to="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-2 px-3 py-2.5 rounded-xl text-xs font-semibold bg-[#181311] text-white flex items-center justify-between shadow-sm"
+              >
+                <span>Open Dashboard</span>
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </Link>
+            ) : (
+              <Link
+                to="/get-started"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-2 px-3 py-2.5 rounded-xl text-xs font-semibold bg-[#181311] text-white flex items-center justify-between shadow-sm"
+              >
+                <span>Get Started</span>
+                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </Link>
+            )}
           </div>
         )}
       </header>
@@ -284,17 +315,17 @@ export const LandingPage: React.FC = () => {
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-14">
           <Link
-            to="/connect-agent"
+            to={isAuthenticated ? "/dashboard" : "/get-started"}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white font-heading font-semibold text-sm shadow-md hover:shadow-lg transition-all"
           >
-            <span>Connect an Agent</span>
+            <span>{isAuthenticated ? "Open Dashboard" : "Get Started"}</span>
             <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
           </Link>
           <Link
-            to="/verify/new"
+            to="/connect-agent"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-[#F3EFEA] border border-[#D5CEC5] text-[#191513] font-heading font-semibold text-sm transition-all"
           >
-            <span>Try the Demo</span>
+            <span>Connect an Agent</span>
           </Link>
         </div>
 
@@ -697,17 +728,17 @@ export const LandingPage: React.FC = () => {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
-                to="/connect-agent"
+                to={isAuthenticated ? "/dashboard" : "/get-started"}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#F3E8DC] hover:bg-[#EAE0D3] text-[#181311] font-heading font-semibold text-sm transition-all"
               >
-                <span>Connect an Agent</span>
+                <span>{isAuthenticated ? "Open Dashboard" : "Get Started"}</span>
                 <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
               </Link>
               <Link
-                to="/docs"
+                to="/connect-agent"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-transparent hover:bg-white/5 border border-white/20 text-white font-heading font-semibold text-sm transition-all"
               >
-                <span>Read the Docs</span>
+                <span>Connect an Agent</span>
               </Link>
             </div>
           </div>
