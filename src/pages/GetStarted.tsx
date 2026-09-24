@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { isSupabaseConfigured } from "../lib/supabase";
 
 export const GetStarted: React.FC = () => {
   const navigate = useNavigate();
@@ -8,6 +9,7 @@ export const GetStarted: React.FC = () => {
   const { isAuthenticated, loading, loginWithGoogle } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [customKey, setCustomKey] = useState("");
 
   // If already logged in, redirect directly to dashboard
   useEffect(() => {
@@ -140,6 +142,53 @@ export const GetStarted: React.FC = () => {
               )}
             </button>
           </div>
+
+          {/* Inline Supabase Anon Key Setup Card when missing in environment */}
+          {!isSupabaseConfigured && (
+            <div className="mt-6 p-4 rounded-2xl bg-[#FFF8F0] border border-[#F3DFC9] text-left">
+              <div className="flex items-center gap-2 text-[#C96A2B] font-heading font-bold text-xs uppercase tracking-wider mb-1.5">
+                <span className="material-symbols-outlined text-[16px]">key</span>
+                <span>Supabase Anon Key Setup</span>
+              </div>
+              <p className="text-xs text-[#6B635B] leading-relaxed mb-3">
+                To connect real Google OAuth, enter your Supabase project's public <code className="bg-[#EAE5DE] px-1 py-0.5 rounded text-[11px] font-mono text-[#191513]">anon</code> key, or add <code className="bg-[#EAE5DE] px-1 py-0.5 rounded text-[11px] font-mono text-[#191513]">VITE_SUPABASE_ANON_KEY</code> to your Vercel Environment Variables.
+              </p>
+              <div className="flex flex-col gap-2">
+                <input
+                  type="password"
+                  value={customKey}
+                  onChange={(e) => setCustomKey(e.target.value.trim())}
+                  placeholder="Paste anon key (starts with eyJ...)"
+                  className="w-full px-3 py-2 bg-white border border-[#E8E4DC] rounded-xl text-xs text-[#191513] placeholder-[#9E948B] focus:outline-none focus:border-[#181311]"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (customKey.startsWith("eyJ") || customKey.length > 20) {
+                      localStorage.setItem("VITE_SUPABASE_ANON_KEY", customKey);
+                      window.location.reload();
+                    } else {
+                      setErrorMsg("Please enter a valid Supabase anon public key (JWT string starting with eyJ...).");
+                    }
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white text-xs font-semibold cursor-pointer transition-all"
+                >
+                  Save Key & Enable Google Auth
+                </button>
+              </div>
+              <div className="mt-3 pt-2.5 border-t border-[#F3DFC9] text-[11px] text-[#9E948B] flex items-center justify-between">
+                <span>Project: tybbujphwrxwpurigeil</span>
+                <a
+                  href="https://supabase.com/dashboard/project/tybbujphwrxwpurigeil/settings/api"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline font-medium text-[#C96A2B] hover:text-[#A7541D]"
+                >
+                  Get API Key &rarr;
+                </a>
+              </div>
+            </div>
+          )}
 
           {/* Footer Notes */}
           <div className="mt-8 pt-6 border-t border-[#E8E4DC] flex flex-col gap-2 text-center text-xs text-[#9E948B]">

@@ -108,19 +108,34 @@ export interface DbCorrection {
 const env = typeof import.meta !== "undefined" ? (import.meta as any).env : {};
 const proc = typeof globalThis !== "undefined" && (globalThis as any).process ? (globalThis as any).process.env : {};
 
-const supabaseUrl = (env?.VITE_SUPABASE_URL || proc?.VITE_SUPABASE_URL || "") as string;
-const supabaseAnonKey = (env?.VITE_SUPABASE_ANON_KEY || proc?.VITE_SUPABASE_ANON_KEY || "") as string;
+const DEFAULT_SUPABASE_PROJECT_ID = "tybbujphwrxwpurigeil";
+const DEFAULT_SUPABASE_URL = `https://${DEFAULT_SUPABASE_PROJECT_ID}.supabase.co`;
+
+const localOverrideUrl =
+  typeof window !== "undefined" ? window.localStorage?.getItem("VITE_SUPABASE_URL") : "";
+const localOverrideKey =
+  typeof window !== "undefined" ? window.localStorage?.getItem("VITE_SUPABASE_ANON_KEY") : "";
+
+export const supabaseUrl = (env?.VITE_SUPABASE_URL ||
+  proc?.VITE_SUPABASE_URL ||
+  localOverrideUrl ||
+  DEFAULT_SUPABASE_URL) as string;
+
+export const supabaseAnonKey = (env?.VITE_SUPABASE_ANON_KEY ||
+  proc?.VITE_SUPABASE_ANON_KEY ||
+  localOverrideKey ||
+  "") as string;
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
 if (!isSupabaseConfigured && typeof window !== "undefined") {
   console.warn(
-    "[VeraOS Supabase] VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY is missing. Add them to .env or Vercel Environment Variables to enable production Supabase persistence and Google Auth."
+    "[VeraOS Supabase] VITE_SUPABASE_ANON_KEY is missing. Add it to Vercel Environment Variables or enter it on /get-started to enable Google OAuth."
   );
 }
 
 // Safe URL configuration to prevent createClient throwing during SSR / build
-const effectiveUrl = supabaseUrl || "https://placeholder-project.supabase.co";
+const effectiveUrl = supabaseUrl || DEFAULT_SUPABASE_URL;
 const effectiveKey = supabaseAnonKey || "placeholder-anon-key";
 
 // Polyfill WebSocket in environments (e.g. Node 20 or SSR without native WebSocket)
