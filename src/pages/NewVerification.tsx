@@ -64,19 +64,20 @@ export const NewVerification: React.FC = () => {
   const { agents } = useAgentContext();
   const { createVerification, isSubmitting, error } = useCreateVerification();
 
-  const [selectedAgent, setSelectedAgent] = useState("Refund Bot (Telegram)");
-  const [taskPrompt, setTaskPrompt] = useState(
-    "Process full refund of $240.00 for order #8812 due to damaged shipment, notify customer via email, and log transaction receipt."
-  );
-  const [claimedOutput, setClaimedOutput] = useState(
-    "Successfully refunded $240.00 to Visa ending in 4242 and sent receipt confirmation email to customer #8812."
-  );
-  const [attachedFiles, setAttachedFiles] = useState([
-    { name: "refund_record.json", size: "12.4 KB", status: "Ready" },
-    { name: "customer_email.pdf", size: "84.1 KB", status: "Ready" },
-  ]);
+  const [selectedAgent, setSelectedAgent] = useState(agents[0]?.name || "Autonomous Worker");
+  const [taskPrompt, setTaskPrompt] = useState("");
+  const [claimedOutput, setClaimedOutput] = useState("");
+  const [attachedFiles, setAttachedFiles] = useState<
+    { name: string; size: string; status: string }[]
+  >([]);
   const [dragActive, setDragActive] = useState(false);
   const [formErrors, setFormErrors] = useState<{ task?: string; output?: string }>({});
+
+  React.useEffect(() => {
+    if (agents.length > 0 && selectedAgent === "Autonomous Worker") {
+      setSelectedAgent(agents[0].name);
+    }
+  }, [agents, selectedAgent]);
 
   const handleApplyPreset = (p: Preset) => {
     setSelectedAgent(p.agent);
@@ -167,15 +168,23 @@ export const NewVerification: React.FC = () => {
               onChange={(e) => setSelectedAgent(e.target.value)}
               className="w-full sm:max-w-md px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#E8E4DC] text-sm text-[#191513] focus:outline-none focus:border-[#181311] transition-colors"
             >
-              <option value="Refund Bot (Telegram)">Refund Bot (Telegram)</option>
-              <option value="ResearchAgent VR-2048">ResearchAgent VR-2048</option>
-              <option value="Settlement Bot">Settlement Bot (Stellar)</option>
-              <option value="Customer Resolution Agent">Customer Resolution Agent</option>
-              {agents.map((ag) => (
-                <option key={ag.id} value={ag.name}>
-                  {ag.name} ({ag.runtime})
-                </option>
-              ))}
+              {agents.length > 0 ? (
+                <>
+                  {agents.map((ag) => (
+                    <option key={ag.id} value={ag.name}>
+                      {ag.name} ({ag.runtime || "Connected"})
+                    </option>
+                  ))}
+                  <option value="Autonomous Worker">Autonomous Worker (Default)</option>
+                </>
+              ) : (
+                <>
+                  <option value={selectedAgent}>{selectedAgent}</option>
+                  {selectedAgent !== "Autonomous Worker" && (
+                    <option value="Autonomous Worker">Autonomous Worker</option>
+                  )}
+                </>
+              )}
             </select>
           </div>
 

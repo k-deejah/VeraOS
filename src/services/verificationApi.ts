@@ -41,7 +41,7 @@ export const verificationApi = {
     if (isSupabaseConfigured && uid) {
       try {
         const records = await supabaseVerificationsService.listVerifications(uid, filters);
-        if (records && records.length > 0) {
+        if (Array.isArray(records)) {
           persistVerifications(records);
           return records;
         }

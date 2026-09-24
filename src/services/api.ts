@@ -1,7 +1,7 @@
 // Core API client storage utilities
 export const STORAGE_KEYS = {
-  VERIFICATIONS: "vera_verifications_store_v1",
-  AGENTS: "vera_agents_store_v1",
+  VERIFICATIONS: "vera_verifications_store_v2",
+  AGENTS: "vera_agents_store_v2",
 };
 
 const memoryStore = new Map<string, string>();

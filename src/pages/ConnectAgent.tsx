@@ -9,8 +9,8 @@ export const ConnectAgent: React.FC = () => {
 
   const [activeStep, setActiveStep] = useState<number>(1);
   const [selectedType, setSelectedType] = useState<"api" | "webhook" | "telegram">("api");
-  const [agentName, setAgentName] = useState("ResearchAgent VR-2048");
-  const [endpoint, setEndpoint] = useState("https://api.acme.ai/agent/verify");
+  const [agentName, setAgentName] = useState("");
+  const [endpoint, setEndpoint] = useState("");
   const [runtime, setRuntime] = useState("TypeScript / Node SDK");
   const [copiedKey, setCopiedKey] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

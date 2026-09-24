@@ -17,9 +17,44 @@ export const VerificationDetail: React.FC = () => {
     );
   }
 
+  if (!verification) {
+    return (
+      <div className="max-w-4xl mx-auto w-full flex flex-col gap-6 font-sans pb-16">
+        <div className="flex items-center gap-2 text-xs text-[#6B635B]">
+          <Link to="/verifications" className="hover:text-[#181311] transition-colors">
+            Verifications
+          </Link>
+          <span>/</span>
+          <span className="font-mono text-[#181311]">Not found</span>
+        </div>
+
+        <div className="p-12 sm:p-20 rounded-2xl bg-white border border-[#E8E4DC] flex flex-col items-center justify-center text-center gap-4 shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-[#FEF5EB] border border-[#FADCC4] flex items-center justify-center text-[#D97736]">
+            <span className="material-symbols-outlined text-[24px]">search_off</span>
+          </div>
+          <div>
+            <h3 className="font-heading font-bold text-lg sm:text-xl text-[#191513]">
+              Verification record not found
+            </h3>
+            <p className="text-xs sm:text-sm text-[#6B635B] max-w-sm mt-1.5 leading-relaxed">
+              We couldn&apos;t find a verification record with ID &quot;{id}&quot;. It may have been removed or does not exist.
+            </p>
+          </div>
+          <Link
+            to="/verifications"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-white text-xs font-heading font-semibold shadow-sm transition-all"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <span>Back to verifications</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   // Derive real verdict status
-  const isPassed = verification?.status === "PASSED";
-  const latestAttempt = verification?.attempts?.[verification.attempts.length - 1];
+  const isPassed = verification.status === "PASSED";
+  const latestAttempt = verification.attempts?.[verification.attempts.length - 1];
   const invariants = latestAttempt?.invariants || [];
   const evidenceList = latestAttempt?.evidence || [];
   const remediationDirectives = latestAttempt?.remediationDirectives || [];
@@ -28,8 +63,8 @@ export const VerificationDetail: React.FC = () => {
   const totalCount = invariants.length || 1;
   const confidencePercent = isPassed ? 98 : Math.max(15, Math.round((passedCount / totalCount) * 100));
 
-  const runId = verification?.displayId ? `Run VR-${verification.displayId}` : id ? `Run VR-${id.slice(-6).toUpperCase()}` : "Run VR-2984";
-  const agentName = verification?.workerName || "Autonomous Agent";
+  const runId = verification.displayId ? `Run VR-${verification.displayId}` : `Run VR-${id?.slice(-6).toUpperCase()}`;
+  const agentName = verification.workerName || "Autonomous Agent";
 
   const formattedDate = verification?.createdAt
     ? new Date(verification.createdAt).toLocaleString(undefined, {

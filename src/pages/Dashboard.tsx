@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useVerificationsList } from "../hooks/useVerification";
 import { Badge } from "../components/ui/Badge";
@@ -66,7 +66,7 @@ export const Dashboard: React.FC = () => {
             Total Verifications
           </span>
           <span className="font-heading text-2xl sm:text-3xl font-bold text-[#191513] mt-1">
-            {totalCount || 4}
+            {totalCount}
           </span>
         </div>
 
@@ -75,7 +75,7 @@ export const Dashboard: React.FC = () => {
             Verified (Pass)
           </span>
           <span className="font-heading text-2xl sm:text-3xl font-bold text-[#1D7A46] mt-1">
-            {passedCount || 3}
+            {passedCount}
           </span>
         </div>
 
@@ -84,7 +84,7 @@ export const Dashboard: React.FC = () => {
             Failed Checks
           </span>
           <span className="font-heading text-2xl sm:text-3xl font-bold text-[#DC2626] mt-1">
-            {failedCount || 1}
+            {failedCount}
           </span>
         </div>
 
@@ -93,7 +93,7 @@ export const Dashboard: React.FC = () => {
             Unverifiable
           </span>
           <span className="font-heading text-2xl sm:text-3xl font-bold text-[#B8621B] mt-1">
-            {unverifiableCount || 0}
+            {unverifiableCount}
           </span>
         </div>
       </div>
