@@ -134,28 +134,22 @@ export const Docs: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3 sm:gap-4 text-xs font-semibold">
-          <Link to="/" className="text-[#6B635B] hover:text-[#191513] transition-colors hidden md:inline-flex items-center gap-1">
+          <Link to="/" className="text-[#6B635B] hover:text-[#191513] transition-colors inline-flex items-center gap-1.5">
             <span className="material-symbols-outlined text-[16px]">home</span>
             <span>Landing Page</span>
           </Link>
-          <a
-            href={GITHUB_REPO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#6B635B] hover:text-[#191513] transition-colors hidden sm:inline-flex items-center gap-1"
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSection("api");
+              window.scrollTo({ top: 300, behavior: "smooth" });
+            }}
+            className="text-[#6B635B] hover:text-[#191513] transition-colors hidden sm:inline-flex items-center gap-1 cursor-pointer"
           >
-            <span>GitHub</span>
-            <span className="text-[10px] text-[#9E948B]">↗</span>
-          </a>
-          <a
-            href={TELEGRAM_BOT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#6B635B] hover:text-[#191513] transition-colors hidden sm:inline-flex items-center gap-1"
-          >
-            <span>Telegram</span>
-            <span className="text-[10px] text-[#9E948B]">↗</span>
-          </a>
+            <span className="material-symbols-outlined text-[16px]">code</span>
+            <span>API Reference</span>
+          </button>
 
           {/* Auth Action: ONLY Sign Up if not authenticated, or Dashboard if authenticated */}
           {isAuthenticated ? (
@@ -209,16 +203,17 @@ export const Docs: React.FC = () => {
 
         {/* Action Links */}
         <div className="flex items-center gap-2.5 flex-wrap shrink-0">
-          <a
-            href={GITHUB_REPO_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#E8E4DC] hover:border-[#181311] text-xs font-semibold text-[#191513] transition-all shadow-2xs"
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSection("architecture");
+              window.scrollTo({ top: 300, behavior: "smooth" });
+            }}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#E8E4DC] hover:border-[#181311] text-xs font-semibold text-[#191513] transition-all shadow-2xs cursor-pointer"
           >
-            <span className="material-symbols-outlined text-[16px]">code</span>
-            <span>GitHub</span>
-            <span className="text-[10px] text-[#9E948B]">↗</span>
-          </a>
+            <span className="material-symbols-outlined text-[16px] text-[#6B635B]">schema</span>
+            <span>Architecture</span>
+          </button>
           <a
             href={TELEGRAM_BOT_URL}
             target="_blank"
@@ -226,7 +221,7 @@ export const Docs: React.FC = () => {
             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#E8E4DC] hover:border-[#181311] text-xs font-semibold text-[#191513] transition-all shadow-2xs"
           >
             <span className="material-symbols-outlined text-[16px] text-[#2AABEE]">send</span>
-            <span>Bot</span>
+            <span>Bot Bridge</span>
             <span className="text-[10px] text-[#9E948B]">↗</span>
           </a>
           <Link
