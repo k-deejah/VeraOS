@@ -114,65 +114,61 @@ export const Docs: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto w-full flex flex-col gap-6 font-sans pb-20">
-      {/* 1. Hero Documentation Header */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-[#181311] border border-[#2A2422] text-[#FFF8F0] shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-2">
+      {/* 1. Developer Documentation Header */}
+      <div className="bg-white rounded-3xl border border-[#E8E4DC] p-6 sm:p-8 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium bg-[#D97736]/20 text-[#D97736] border border-[#D97736]/40">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#D97736] animate-pulse" />
-              <span>VeraOS v0.2.0 • Production Release</span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-medium bg-[#FAF8F5] text-[#191513] border border-[#E8E4DC]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1D7A46]" />
+              <span>Stellar Protocol 21</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              <span>Stellar Testnet Live</span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-medium bg-[#FAF8F5] text-[#6B635B] border border-[#E8E4DC]">
+              <span>v0.2.0 Release</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
-              <span>Telegram Bot Active</span>
+            <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-mono text-[#D97736] bg-[#FFF8F0] border border-[#F3DFC9]">
+              <span>RFC-0442 Attestation</span>
             </span>
           </div>
-          <h1 className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
-            Vera<span className="text-[#D97736]">OS</span> Developer & Protocol Documentation
-          </h1>
-          <p className="text-xs sm:text-sm text-white/70 max-w-2xl leading-relaxed">
-            The independent verification layer for AI agents. Validate task completion, enforce cryptographic
-            invariants, and audit Stellar Soroban transactions before work is trusted or settled.
-          </p>
+
+          <div>
+            <h1 className="font-heading text-2xl sm:text-3xl font-extrabold text-[#191513] tracking-tight">
+              Developer &amp; Protocol Documentation
+            </h1>
+            <p className="text-xs sm:text-sm text-[#6B635B] max-w-2xl leading-relaxed mt-1.5">
+              The independent cryptographic verification layer for AI agents. Validate task completion,
+              enforce invariants, and audit Stellar Soroban transactions before work is trusted or settled.
+            </p>
+          </div>
         </div>
 
-        {/* Quick Action Badges */}
-        <div className="flex flex-wrap sm:flex-col gap-2.5 shrink-0">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-white transition-all"
-          >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
-            <span>Back to Landing Page</span>
-          </Link>
+        {/* Action Links */}
+        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
           <a
             href={GITHUB_REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-white transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#E8E4DC] hover:border-[#181311] text-xs font-semibold text-[#191513] transition-all shadow-2xs"
           >
             <span className="material-symbols-outlined text-[16px]">code</span>
-            <span>GitHub Repository</span>
-            <span className="text-[10px]">↗</span>
+            <span>GitHub</span>
+            <span className="text-[10px] text-[#9E948B]">↗</span>
           </a>
           <a
             href={TELEGRAM_BOT_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#2AABEE]/20 hover:bg-[#2AABEE]/30 border border-[#2AABEE]/40 text-xs font-semibold text-[#7DD4FF] transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-[#FAF8F5] border border-[#E8E4DC] hover:border-[#181311] text-xs font-semibold text-[#191513] transition-all shadow-2xs"
           >
-            <span className="material-symbols-outlined text-[16px]">send</span>
-            <span>{TELEGRAM_BOT_HANDLE}</span>
-            <span className="text-[10px]">↗</span>
+            <span className="material-symbols-outlined text-[16px] text-[#2AABEE]">send</span>
+            <span>Bot</span>
+            <span className="text-[10px] text-[#9E948B]">↗</span>
           </a>
           <Link
             to="/verify/new"
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#D97736] hover:bg-[#B8621B] text-xs font-heading font-semibold text-white transition-all shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-xs font-heading font-semibold text-white transition-all shadow-sm"
           >
-            <span className="material-symbols-outlined text-[16px]">add_task</span>
-            <span>Run Live Verification</span>
+            <span className="material-symbols-outlined text-[16px] text-[#D97736]">play_arrow</span>
+            <span>Run Verification</span>
           </Link>
         </div>
       </div>

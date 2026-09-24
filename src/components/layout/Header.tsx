@@ -421,20 +421,13 @@ export const Header: React.FC<HeaderProps> = ({ onOpenMobileMenu }) => {
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                to="/signin"
-                className="px-3 py-1.5 rounded-xl border border-[#E8E4DC] hover:border-[#181311] text-xs font-semibold text-[#191513] transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/signup"
-                className="px-3.5 py-1.5 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-xs font-semibold text-white transition-colors"
-              >
-                Sign Up
-              </Link>
-            </div>
+            <Link
+              to="/signup"
+              className="px-4 py-2 rounded-xl bg-[#181311] hover:bg-[#2A2422] text-xs font-heading font-semibold text-white transition-all shadow-sm flex items-center gap-1.5"
+            >
+              <span>Sign Up</span>
+              <span className="material-symbols-outlined text-[15px]">arrow_forward</span>
+            </Link>
           )}
         </div>
       </header>
