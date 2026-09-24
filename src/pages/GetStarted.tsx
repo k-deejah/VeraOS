@@ -6,7 +6,7 @@ import { isSupabaseConfigured } from "../lib/supabase";
 export const GetStarted: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, loading, loginWithGoogle, loginAsDemo } = useAuth();
+  const { isAuthenticated, loading, loginWithGoogle } = useAuth();
 
   const isSignUpPath = location.pathname === "/signup";
   const [authMode, setAuthMode] = useState<"signin" | "signup">(isSignUpPath ? "signup" : "signin");
@@ -59,7 +59,7 @@ export const GetStarted: React.FC = () => {
           <span className="w-2.5 h-2.5 rounded-full bg-[#181311]" />
         </div>
         <span className="w-7 h-7 border-2 border-[#181311] border-t-transparent rounded-full animate-spin" />
-        <span className="font-mono text-xs text-[#9E948B]">Checking operator session...</span>
+        <span className="font-mono text-xs text-[#9E948B]">Checking session...</span>
       </div>
     );
   }
@@ -195,32 +195,6 @@ export const GetStarted: React.FC = () => {
                   </span>
                 </>
               )}
-            </button>
-
-            <div className="relative flex items-center justify-center my-0.5">
-              <div className="border-t border-[#E8E4DC] w-full" />
-              <span className="bg-white px-2.5 text-[10px] font-mono text-[#9E948B] uppercase tracking-wider">
-                or
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                loginAsDemo();
-                const destination = (location.state as any)?.from?.pathname || "/dashboard";
-                navigate(destination, { replace: true });
-              }}
-              className="w-full py-3 px-4 rounded-xl border border-[#E8E4DC] hover:border-[#181311] hover:bg-[#FAF8F5] active:scale-[0.99] text-[#191513] font-heading font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
-            >
-              <span className="material-symbols-outlined text-[18px] text-[#D97736]">
-                bolt
-              </span>
-              <span>
-                {authMode === "signin"
-                  ? "Continue as Demo Operator (Instant Access)"
-                  : "Explore with Demo Access"}
-              </span>
             </button>
           </div>
 
