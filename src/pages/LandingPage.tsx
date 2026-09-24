@@ -788,9 +788,15 @@ export const LandingPage: React.FC = () => {
             <span>All verification engines operational</span>
           </div>
 
-          <div className="flex items-center gap-6 text-xs text-[#6B635B]">
+          <div className="flex items-center gap-5 sm:gap-6 text-xs text-[#6B635B] flex-wrap justify-center">
             <Link to="/docs" className="hover:text-[#191513] transition-colors">
               Docs
+            </Link>
+            <Link to="/privacy" className="hover:text-[#191513] transition-colors">
+              Privacy
+            </Link>
+            <Link to="/terms" className="hover:text-[#191513] transition-colors">
+              Terms
             </Link>
             <a
               href={GITHUB_REPO_URL}

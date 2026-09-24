@@ -636,7 +636,7 @@ console.log("Evidence items:", result.attempts[0].evidence.length);`}
               {/* Live Testnet Explorer Showcase */}
               <div className="flex flex-col gap-4">
                 <h3 className="font-heading font-bold text-base text-[#191513]">
-                  Live Testnet Demonstration Transactions
+                  Live Verified On-Chain Transactions
                 </h3>
 
                 {/* Case 1: Deficit Exploit Flagged */}
