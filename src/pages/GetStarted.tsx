@@ -177,9 +177,9 @@ export const GetStarted: React.FC = () => {
                 </button>
               </div>
               <div className="mt-3 pt-2.5 border-t border-[#F3DFC9] text-[11px] text-[#9E948B] flex items-center justify-between">
-                <span>Project: tybbujphwrxwpurigeil</span>
+                <span>Project: ascptvjdywguyrcxjxcb</span>
                 <a
-                  href="https://supabase.com/dashboard/project/tybbujphwrxwpurigeil/settings/api"
+                  href="https://supabase.com/dashboard/project/ascptvjdywguyrcxjxcb/settings/api"
                   target="_blank"
                   rel="noreferrer"
                   className="underline font-medium text-[#C96A2B] hover:text-[#A7541D]"

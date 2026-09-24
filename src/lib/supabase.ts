@@ -108,7 +108,7 @@ export interface DbCorrection {
 const env = typeof import.meta !== "undefined" ? (import.meta as any).env : {};
 const proc = typeof globalThis !== "undefined" && (globalThis as any).process ? (globalThis as any).process.env : {};
 
-const DEFAULT_SUPABASE_PROJECT_ID = "tybbujphwrxwpurigeil";
+const DEFAULT_SUPABASE_PROJECT_ID = "ascptvjdywguyrcxjxcb";
 const DEFAULT_SUPABASE_URL = `https://${DEFAULT_SUPABASE_PROJECT_ID}.supabase.co`;
 
 const localOverrideUrl =
