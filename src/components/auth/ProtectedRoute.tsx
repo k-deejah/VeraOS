@@ -9,8 +9,14 @@ interface ProtectedRouteProps {
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
+  const [forceProceed, setForceProceed] = React.useState(false);
 
-  if (loading) {
+  React.useEffect(() => {
+    const timer = setTimeout(() => setForceProceed(true), 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading && !forceProceed) {
     return (
       <div className="min-h-screen bg-[#F7F5F0] flex flex-col items-center justify-center gap-3 text-[#6B635B]">
         <div className="flex items-center gap-1 mb-2">

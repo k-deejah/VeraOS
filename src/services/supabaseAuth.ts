@@ -1,5 +1,9 @@
 import { supabase, isSupabaseConfigured, Profile } from "../lib/supabase";
 
+// In-memory cache to prevent duplicate database round-trips during login burst
+const profileCache = new Map<string, { profile: Profile; timestamp: number }>();
+const CACHE_TTL_MS = 60_000;
+
 export const supabaseAuthService = {
   /**
    * Initiate real Google OAuth sign-in flow via Supabase Auth
@@ -17,7 +21,7 @@ export const supabaseAuthService = {
       const redirectUri =
         typeof window !== "undefined"
           ? `${window.location.origin}/auth/callback`
-          : "http://localhost:5173/auth/callback";
+          : "http://localhost:3000/auth/callback";
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
@@ -25,7 +29,6 @@ export const supabaseAuthService = {
           redirectTo: redirectUri,
           queryParams: {
             access_type: "offline",
-            prompt: "select_account",
           },
         },
       });
@@ -42,6 +45,7 @@ export const supabaseAuthService = {
    * Sign out and clear active Supabase session
    */
   async signOut(): Promise<void> {
+    profileCache.clear();
     if (isSupabaseConfigured) {
       try {
         await supabase.auth.signOut();
@@ -52,10 +56,16 @@ export const supabaseAuthService = {
   },
 
   /**
-   * Ensure user profile exists in public.profiles table
+   * Ensure user profile exists in public.profiles table (cached to avoid redundant queries)
    */
   async syncUserProfile(user: any): Promise<Profile | null> {
     if (!isSupabaseConfigured || !user?.id) return null;
+
+    // Check fast cache first
+    const cached = profileCache.get(user.id);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.profile;
+    }
 
     try {
       // 1. Try to fetch existing profile
@@ -66,7 +76,9 @@ export const supabaseAuthService = {
         .maybeSingle();
 
       if (existing && !fetchErr) {
-        return existing as Profile;
+        const prof = existing as Profile;
+        profileCache.set(user.id, { profile: prof, timestamp: Date.now() });
+        return prof;
       }
 
       // 2. Insert new profile if not found
@@ -96,7 +108,9 @@ export const supabaseAuthService = {
         return null;
       }
 
-      return inserted as Profile;
+      const prof = inserted as Profile;
+      profileCache.set(user.id, { profile: prof, timestamp: Date.now() });
+      return prof;
     } catch (err) {
       console.error("[supabaseAuthService] syncUserProfile failed:", err);
       return null;

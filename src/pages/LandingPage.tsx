@@ -18,6 +18,16 @@ export const LandingPage: React.FC = () => {
   const isPassed = latestVerification ? latestVerification.status === "PASSED" : true;
 
   useEffect(() => {
+    // If Supabase OAuth redirected back to root with access_token in URL hash
+    if (
+      typeof window !== "undefined" &&
+      window.location.hash &&
+      (window.location.hash.includes("access_token") || window.location.hash.includes("error"))
+    ) {
+      navigate("/auth/callback" + window.location.search + window.location.hash, { replace: true });
+      return;
+    }
+
     if ((location.state as any)?.openAuth) {
       if (!isAuthenticated) {
         navigate("/get-started");

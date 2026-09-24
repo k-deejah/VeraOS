@@ -42,17 +42,20 @@ export const AuthCallback: React.FC = () => {
         }
 
         if (data.session?.user) {
-          // Ensure profile is created/synced
-          await supabaseAuthService.syncUserProfile(data.session.user);
-          await refetchUser();
+          const user = data.session.user;
 
-          // Check if this user already has verification runs
-          const { count } = await supabase
-            .from("verification_runs")
-            .select("id", { count: "exact", head: true })
-            .eq("user_id", data.session.user.id);
+          // Parallelize profile sync and onboarding check in a single round-trip
+          const [_, runsResult] = await Promise.allSettled([
+            supabaseAuthService.syncUserProfile(user),
+            supabase
+              .from("verification_runs")
+              .select("id", { count: "exact", head: true })
+              .eq("user_id", user.id),
+          ]);
 
           if (mounted) {
+            const count =
+              runsResult.status === "fulfilled" ? runsResult.value.count : 1;
             // If new user with no runs, guide through lightweight onboarding
             if (!count || count === 0) {
               navigate("/welcome", { replace: true });
@@ -63,11 +66,10 @@ export const AuthCallback: React.FC = () => {
         } else {
           // If no session yet, listen once for auth state change
           const { data: authSub } = supabase.auth.onAuthStateChange(
-            async (event, session) => {
+            async (_event, session) => {
               if (session?.user && mounted) {
-                await supabaseAuthService.syncUserProfile(session.user);
-                await refetchUser();
                 authSub.subscription.unsubscribe();
+                supabaseAuthService.syncUserProfile(session.user).catch(() => {});
                 navigate("/dashboard", { replace: true });
               }
             }

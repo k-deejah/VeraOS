@@ -31,6 +31,7 @@ interface AuthContextType {
   closeAuthModal: () => void;
   login: (email: string, pass: string) => Promise<boolean>;
   loginWithGoogle: () => Promise<boolean>;
+  loginAsDemo: () => void;
   signup: (name: string, email: string, pass: string) => Promise<boolean>;
   connectWallet: (customAddress?: string) => Promise<boolean>;
   redeemInviteCode: (code: string) => Promise<{ success: boolean; message: string }>;
@@ -67,60 +68,104 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      if (typeof window !== "undefined" && localStorage.getItem("vera_logged_out") !== "1") {
+        const raw = localStorage.getItem(STORAGE_AUTH_KEY);
+        if (raw) return JSON.parse(raw);
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<"signin" | "signup">("signup");
 
-  // Supabase real session listener and sync
+  // Supabase real session listener and sync with safety timeout
   useEffect(() => {
+    let isMounted = true;
+
+    // Safety timeout: Ensure the UI loader NEVER hangs for more than 1.2s under any network or lock condition
+    const safetyTimer = setTimeout(() => {
+      if (isMounted) {
+        setLoading(false);
+      }
+    }, 1200);
+
     if (!isSupabaseConfigured) {
       setLoading(false);
+      clearTimeout(safetyTimer);
       return;
     }
-
-    let isMounted = true;
 
     // 1. Initial session check
     supabase.auth
       .getSession()
-      .then(async ({ data: { session } }) => {
+      .then(async ({ data: { session }, error }) => {
         if (!isMounted) return;
+        if (error) {
+          console.warn("[AuthContext] getSession warning:", error.message);
+        }
         if (session?.user) {
-          try {
-            const profile = await supabaseAuthService.syncUserProfile(session.user);
-            if (!isMounted) return;
-            const activeUser: User = {
-              id: session.user.id,
-              name:
-                profile?.full_name ||
-                session.user.user_metadata?.full_name ||
-                session.user.email?.split("@")[0] ||
-                "Operator",
-              email: session.user.email || "",
-              role: profile?.role || "operator",
-              avatar: profile?.avatar_url || session.user.user_metadata?.avatar_url,
-              walletAddress: profile?.stellar_wallet || undefined,
-              authProvider: "google",
-              googleId: session.user.id,
-              invitationStatus: "invited",
-              createdAt: profile?.created_at || session.user.created_at,
-              apiKey: profile?.api_key || `vera_live_${session.user.id.slice(0, 8)}`,
-            };
-            setUser(activeUser);
-            localStorage.removeItem("vera_logged_out");
-          } catch (e) {
-            console.error("Error synchronizing session user:", e);
-          }
+          // Optimistic set so UI unlocks immediately (0ms wait)
+          const fastUser: User = {
+            id: session.user.id,
+            name:
+              session.user.user_metadata?.full_name ||
+              session.user.user_metadata?.name ||
+              session.user.email?.split("@")[0] ||
+              "Operator",
+            email: session.user.email || "",
+            role: "operator",
+            avatar: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
+            walletAddress: undefined,
+            authProvider: "google",
+            googleId: session.user.id,
+            invitationStatus: "invited",
+            createdAt: session.user.created_at,
+            apiKey: `vera_live_${session.user.id.slice(0, 8)}`,
+          };
+          setUser(fastUser);
+          localStorage.removeItem("vera_logged_out");
+          setLoading(false);
+          clearTimeout(safetyTimer);
+
+          // Background sync profile without blocking the UI
+          supabaseAuthService
+            .syncUserProfile(session.user)
+            .then((profile) => {
+              if (profile && isMounted) {
+                setUser((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        name: profile.full_name || prev.name,
+                        role: profile.role || prev.role,
+                        avatar: profile.avatar_url || prev.avatar,
+                        walletAddress: profile.stellar_wallet || prev.walletAddress,
+                        apiKey: profile.api_key || prev.apiKey,
+                      }
+                    : null
+                );
+              }
+            })
+            .catch(() => {});
         } else {
           if (localStorage.getItem("vera_logged_out") === "1") {
             setUser(null);
           }
+          setLoading(false);
+          clearTimeout(safetyTimer);
         }
-        setLoading(false);
       })
-      .catch(() => {
-        if (isMounted) setLoading(false);
+      .catch((err) => {
+        console.warn("[AuthContext] getSession caught error:", err);
+        if (isMounted) {
+          setLoading(false);
+          clearTimeout(safetyTimer);
+        }
       });
 
     // 2. Auth state subscription
@@ -129,36 +174,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!isMounted) return;
       if (session?.user) {
-        const profile = await supabaseAuthService.syncUserProfile(session.user);
-        if (!isMounted) return;
-        const activeUser: User = {
+        // Optimistic update
+        const fastUser: User = {
           id: session.user.id,
           name:
-            profile?.full_name ||
             session.user.user_metadata?.full_name ||
+            session.user.user_metadata?.name ||
             session.user.email?.split("@")[0] ||
             "Operator",
           email: session.user.email || "",
-          role: profile?.role || "operator",
-          avatar: profile?.avatar_url || session.user.user_metadata?.avatar_url,
-          walletAddress: profile?.stellar_wallet || undefined,
+          role: "operator",
+          avatar: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
+          walletAddress: undefined,
           authProvider: "google",
           googleId: session.user.id,
           invitationStatus: "invited",
-          createdAt: profile?.created_at || session.user.created_at,
-          apiKey: profile?.api_key || `vera_live_${session.user.id.slice(0, 8)}`,
+          createdAt: session.user.created_at,
+          apiKey: `vera_live_${session.user.id.slice(0, 8)}`,
         };
-        setUser(activeUser);
+        setUser(fastUser);
         localStorage.removeItem("vera_logged_out");
+        setLoading(false);
+        clearTimeout(safetyTimer);
+
+        // Background profile sync
+        supabaseAuthService
+          .syncUserProfile(session.user)
+          .then((profile) => {
+            if (profile && isMounted) {
+              setUser((prev) =>
+                prev
+                  ? {
+                      ...prev,
+                      name: profile.full_name || prev.name,
+                      role: profile.role || prev.role,
+                      avatar: profile.avatar_url || prev.avatar,
+                      walletAddress: profile.stellar_wallet || prev.walletAddress,
+                      apiKey: profile.api_key || prev.apiKey,
+                    }
+                  : null
+              );
+            }
+          })
+          .catch(() => {});
       } else if (event === "SIGNED_OUT") {
         setUser(null);
         localStorage.setItem("vera_logged_out", "1");
+        setLoading(false);
+        clearTimeout(safetyTimer);
       }
-      setLoading(false);
     });
 
     return () => {
       isMounted = false;
+      clearTimeout(safetyTimer);
       subscription.unsubscribe();
     };
   }, []);
@@ -167,7 +236,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       if (user) {
         localStorage.setItem(STORAGE_AUTH_KEY, JSON.stringify(user));
-      } else {
+      } else if (localStorage.getItem("vera_logged_out") === "1") {
         localStorage.removeItem(STORAGE_AUTH_KEY);
       }
     } catch {
@@ -397,6 +466,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw error;
     }
     return true;
+  };
+
+  const loginAsDemo = () => {
+    const demoUser: User = {
+      id: "usr_demo_operator",
+      name: "Demo Operator",
+      email: "operator@vera-os.local",
+      role: "Lead Verification Engineer",
+      authProvider: "password",
+      invitationStatus: "admin",
+      createdAt: new Date().toISOString(),
+      apiKey: "vera_live_demo_98471928",
+    };
+    setUser(demoUser);
+    localStorage.removeItem("vera_logged_out");
+    setLoading(false);
+    setIsAuthModalOpen(false);
   };
 
   const redeemInviteCode = async (code: string): Promise<{ success: boolean; message: string }> => {
@@ -675,6 +761,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         closeAuthModal,
         login,
         loginWithGoogle,
+        loginAsDemo,
         signup,
         connectWallet,
         redeemInviteCode,

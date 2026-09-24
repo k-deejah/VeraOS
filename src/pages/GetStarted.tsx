@@ -6,10 +6,17 @@ import { isSupabaseConfigured } from "../lib/supabase";
 export const GetStarted: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, loading, loginWithGoogle } = useAuth();
+  const { isAuthenticated, loading, loginWithGoogle, loginAsDemo } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [customKey, setCustomKey] = useState("");
+  const [forceShow, setForceShow] = useState(false);
+
+  // Fallback timer so checking session never locks the screen
+  useEffect(() => {
+    const timer = setTimeout(() => setForceShow(true), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   // If already logged in, redirect directly to dashboard
   useEffect(() => {
@@ -32,7 +39,7 @@ export const GetStarted: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading && !forceShow) {
     return (
       <div className="min-h-screen bg-[#F7F5F0] flex flex-col items-center justify-center gap-3 text-[#6B635B]">
         <div className="flex items-center gap-1 mb-2">
@@ -104,7 +111,7 @@ export const GetStarted: React.FC = () => {
             </div>
           )}
 
-          {/* Primary Action Button required by prompt */}
+          {/* Primary Action Buttons */}
           <div className="mt-8 flex flex-col gap-3">
             <button
               type="button"
@@ -140,6 +147,28 @@ export const GetStarted: React.FC = () => {
                   <span>Continue with Google</span>
                 </>
               )}
+            </button>
+
+            <div className="relative flex items-center justify-center my-0.5">
+              <div className="border-t border-[#E8E4DC] w-full" />
+              <span className="bg-white px-2.5 text-[10px] font-mono text-[#9E948B] uppercase tracking-wider">
+                or
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                loginAsDemo();
+                const destination = (location.state as any)?.from?.pathname || "/dashboard";
+                navigate(destination, { replace: true });
+              }}
+              className="w-full py-3 px-4 rounded-xl border border-[#E8E4DC] hover:border-[#181311] hover:bg-[#FAF8F5] active:scale-[0.99] text-[#191513] font-heading font-semibold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+            >
+              <span className="material-symbols-outlined text-[18px] text-[#D97736]">
+                bolt
+              </span>
+              <span>Continue as Demo Operator (Instant Access)</span>
             </button>
           </div>
 
